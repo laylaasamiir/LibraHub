@@ -11,7 +11,6 @@ function App() {
     <Routes>
       <Route path='/' element={<StudentProfile/> } />
       <Route path='login' element={<Login/>}/>
-  
       <Route path='*' element={<h1>404 Not Found</h1>} />
       
     </Routes>
