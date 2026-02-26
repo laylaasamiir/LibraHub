@@ -3,8 +3,7 @@ import './App.css';
 import { Route, Routes } from 'react-router-dom';
 import { StudentProfile } from './Pages/StudentProfile';
 import Login from './Pages/Login';
-import { StudentRegister } from './Pages/StudentRegister';
-
+import StudentRegister from './Pages/StudentRegister';
 
 function App() {
   return (
