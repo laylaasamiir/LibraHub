@@ -1,10 +1,8 @@
 .pc-card {
-      border: 1px solid rgba(172,186,196,0.35);
+    border: 1px solid rgba(172, 186, 196, 0.35);
     border-radius: 16px;
     padding: 18px;
-   box-shadow:
-    0 30px 80px rgba(33,52,72,0.25),
-    0 10px 30px rgba(33,52,72,0.15);
+    box-shadow: 0 30px 80px rgba(33, 52, 72, 0.25), 0 10px 30px rgba(33, 52, 72, 0.15);
     width: 100%;
     max-width: 780px;
     margin: 40px auto;
@@ -41,7 +39,6 @@
     color: #547792;
 }
 
-
 .pc-actions {
     display: flex;
     justify-content: flex-end;
@@ -61,13 +58,14 @@
 .pc-btn:hover {
     filter: brightness(0.96);
 }
+
 .loans-table {
-  width: 100%;
-  border-collapse: collapse;
+    width: 100%;
+    border-collapse: collapse;
 }
 
 .loans-table th {
-  text-align: left;
-  padding: 12px;
-  color: #547792;
+    text-align: left;
+    padding: 12px;
+    color: #547792;
 }
