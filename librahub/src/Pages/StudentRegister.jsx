@@ -1,4 +1,5 @@
 import React from 'react'
+<<<<<<< HEAD
 import './StudentRegister.css'
 const StudentRegister = () => {
   return (
@@ -27,3 +28,11 @@ const StudentRegister = () => {
 }
 
 export default StudentRegister
+=======
+
+export const StudentRegister = () => {
+  return (
+    <div>StudentRegister</div>
+  )
+}
+>>>>>>> f00dc1b576f5beb01e0a2fa4e81f14b15caff92e

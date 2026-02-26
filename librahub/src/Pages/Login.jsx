@@ -8,10 +8,10 @@ const Login = () => {
                 <img src="/gradCap.jpg" alt="Graduation Cap" className="login-icon"/>
                 <h1>Student login</h1>
                 <form action="#" method="post">
-                    <label htmlfor="CollegeEmail">email</label>
+                    <label htmlFor="CollegeEmail">email</label>
                     <input type="email" id="CollegeEmail" name="CollegeEmail" placeholder="Enter your email" required/>
 
-                    <label htmlfor="password">password</label>
+                    <label htmlFor="password">password</label>
                     <input type="password" id="password" name="password" placeholder="Enter your password" required/>
 
                     <button type="submit">login</button>
