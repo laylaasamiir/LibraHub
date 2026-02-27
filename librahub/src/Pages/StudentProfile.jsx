@@ -1,9 +1,15 @@
 import React from 'react'
+import { StuCard } from '../components/Stucard'
+import { StuTable } from '../components/StuTable'
+
+
+
 
 export const StudentProfile = () => {
   return (
-   <>
-    <h1>Student Profile</h1>
-   </>
+    <>
+      <StuCard />
+      <StuTable/>
+    </>
   )
 }
