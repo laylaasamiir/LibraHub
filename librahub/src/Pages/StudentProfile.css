@@ -39,6 +39,13 @@
     color: #547792;
 }
 
+.pc-value {
+    font-size: 18px;
+    font-weight: 500;
+    color: #213448;
+}
+
+
 .pc-actions {
     display: flex;
     justify-content: flex-end;
