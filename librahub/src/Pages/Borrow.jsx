@@ -1,7 +1,7 @@
 import React from 'react'
-import "./main.css";
+import "./Borrow.css";
 import {FaUser, FaLock} from "react-icons/fa";
-const Main = () => {
+const Borrow = () => {
     
   return (
      <>
@@ -66,4 +66,4 @@ const Main = () => {
       )
 }
 
-export default Main
+export default Borrow
