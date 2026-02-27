@@ -83,3 +83,10 @@
     color: #2f68aa;
     text-decoration: none;
 }
+.input-error {
+  color: #d32f2f;
+  font-size: 13px;
+  font-weight: 500;
+  margin-bottom: 4px;
+  margin-top: 8px;
+}
