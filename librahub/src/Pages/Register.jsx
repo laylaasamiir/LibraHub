@@ -12,7 +12,8 @@ export default function Register() {
   const [level, setLevel] = useState();
   const [department, setDepartment] = useState("");
 
-  const handleRegister = async () => {
+  const handleRegister = async (e) => {
+     e.preventDefault();
     try {
       const res = await createUserWithEmailAndPassword(auth, email, password);
 
