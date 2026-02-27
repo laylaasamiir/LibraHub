@@ -2,6 +2,8 @@ import React, { useState } from 'react';
 import { signInWithEmailAndPassword } from "firebase/auth";
 import { auth } from "../firebase";
 import { useNavigate } from "react-router-dom";
+import { doc, getDoc } from "firebase/firestore";
+import { db } from "../firebase"; 
 import { Link } from "react-router-dom";
 import './login.css';
 
@@ -14,9 +16,20 @@ const handleLogin = async (e) => {
   e.preventDefault(); 
 
   try {
-    await signInWithEmailAndPassword(auth, email, password);
-    alert("Login successful ✅");
-    navigate("/StudentProfile"); 
+    const userCredential = await signInWithEmailAndPassword(auth, email, password);
+    const user = userCredential.user;
+
+    const docRef = doc(db, "users", user.uid);
+    const docSnap = await getDoc(docRef);
+
+    if (docSnap.exists()) {
+      const userData = docSnap.data();
+      if (userData.role === "admin") navigate("/admin");
+      else navigate("/StudentProfile");
+    } else {
+      alert("No user data found.");
+    }
+
   } catch (error) {
     alert(error.message);
   }
@@ -25,8 +38,8 @@ const handleLogin = async (e) => {
     <div className="login-page">
       <main className="login-main">
         <div className="login-container">
-          <img src="/gradCap.jpg" alt="Graduation Cap" className="login-icon"/>
-          <h1 className="login-title">Student Login</h1>
+          <img src="/book.jpg" alt="Graduation Cap" className="login-icon"/>
+          <h1 className="login-title">Login</h1>
           <form className="login-form" onSubmit={handleLogin}>
             <label htmlFor="CollegeEmail" className="login-label">Email</label>
             <input type="email" value={email} onChange={(e) => setEmail(e.target.value)} placeholder="Enter your email" required className="login-input"/>
