@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import "../Pages/StudentProfile.css";
 import { auth, db } from "../firebase";
 import { doc, getDoc } from "firebase/firestore";
-import { onAuthStateChanged } from "firebase/auth"; // ✅ مهم
+import { onAuthStateChanged } from "firebase/auth"; 
 
 export const StuCard = () => {
   const [userData, setUserData] = useState(null);
