@@ -10,7 +10,7 @@ import Register from './Pages/Register';
 function App() {
   return (
     <Routes>
-      <Route path='/' element={<StudentProfile/> } />
+      <Route path='/StudentProfile' element={<StudentProfile/> } />
       <Route path='login' element={<Login/>}/>
       <Route path='/Register' element={<Register/>}/>
       <Route path='/Main' element={<Main/>}/>
