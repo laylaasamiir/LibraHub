@@ -24,7 +24,7 @@ const handleLogin = async (e) => {
 
     if (docSnap.exists()) {
       const userData = docSnap.data();
-      if (userData.role === "admin") navigate("/admin");
+      if (userData.role === "admin") navigate("/Admin");
       else navigate("/StudentProfile");
     } else {
       alert("No user data found.");
