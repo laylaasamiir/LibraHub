@@ -51,7 +51,7 @@ export default function Register() {
         level,
         createdAt: Date.now(),
       });
-       navigate("/student-profile");
+       navigate("/StudentProfile");
 
 
     } catch (e) {
