@@ -7,6 +7,7 @@ import Register from './Pages/Register';
 import { Main } from './Pages/Main';
 import { Admin } from './Pages/Admin';
 import AddBook from './Pages/AddBook';
+import { Complete } from './components/Complete';
 import AdminRegister  from './Pages/AdminRegister';
  
 
@@ -17,9 +18,10 @@ function App() {
       <Route path='/Borrow' element={<Borrow/>}/>
       <Route path='login' element={<Login/>}/>
       <Route path='Register' element={<Register/>}/>
-      <Route path='/' element={<Main/>}/>
+      <Route path='/Main' element={<Main/>}/>
       <Route path='/Admin' element={<Admin/>} />
       <Route path='/add-book' element={<AddBook/>} />
+      <Route path='/complete-profile' element={<Complete />} />
       <Route path='/AdminRegister' element={<AdminRegister/>} />
  
       <Route path='*' element={<h1>404 Not Found</h1>} />
