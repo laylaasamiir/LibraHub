@@ -21,8 +21,10 @@ export const Admin = () => {
 
     
             <div className="dark">
-                <img src="./addBook.jpeg"/>
+                <img src="./addBook.jpeg" alt="Add Book"/>
+                <Link to="/add-book">
                 <button>Add Books</button>
+                </Link>
             </div>
 
         </div>
