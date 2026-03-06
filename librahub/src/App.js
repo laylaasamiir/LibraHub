@@ -18,7 +18,7 @@ function App() {
       <Route path='/Borrow' element={<Borrow/>}/>
       <Route path='login' element={<Login/>}/>
       <Route path='Register' element={<Register/>}/>
-      <Route path='/Main' element={<Main/>}/>
+      <Route path='/' element={<Main/>}/>
       <Route path='/Admin' element={<Admin/>} />
       <Route path='/add-book' element={<AddBook/>} />
       <Route path='/complete-profile' element={<Complete />} />
