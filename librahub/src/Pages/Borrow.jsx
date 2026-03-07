@@ -50,8 +50,15 @@ const Borrow = () => {
                     <td style={{textAlign:'center'}}>
                          
                     </td>
+                </tr>
 
-
+                <tr>
+                    <td> layla</td>
+                    <td>chemistry</td>
+                    <td>2026 10pm</td>
+                    <td style={{textAlign:'center'}}>
+                         
+                    </td>
                 </tr>
             </tbody>
         </table>
