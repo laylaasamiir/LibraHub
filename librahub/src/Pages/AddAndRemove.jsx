@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { db } from "../firebase";
+import { Link } from "react-router-dom";
 import { collection, query, where, onSnapshot } from "firebase/firestore";
 import './StudentProfile.css';
 
@@ -46,6 +47,9 @@ export const AddAndRemove = () => {
                 ))}
             </tbody>
         </table>
+        <Link to="/AdminRegister">
+        <button className="add-admin" title="Add New Admin">+</button>
+        </Link>
        </div>
   );
 };

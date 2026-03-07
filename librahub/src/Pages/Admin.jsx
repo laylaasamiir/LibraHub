@@ -28,8 +28,8 @@ export const Admin = () => {
             </div>
 
         </div>
-        <Link to="/AdminRegister">
-        <button className="add-admin" title="Add New Admin">+</button>
+        <Link to="/AddAndRemove">
+        <button className="add-admin" title="Add New Admin">+/-</button>
         </Link>
     </div>
    
