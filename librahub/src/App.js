@@ -9,6 +9,7 @@ import { Admin } from './Pages/Admin';
 import AddBook from './Pages/AddBook';
 import { Complete } from './components/Complete';
 import AdminRegister  from './Pages/AdminRegister';
+import  {AddAndRemove}  from './Pages/AddAndRemove';
  
 
 function App() {
@@ -23,6 +24,7 @@ function App() {
       <Route path='/add-book' element={<AddBook/>} />
       <Route path='/complete-profile' element={<Complete />} />
       <Route path='/AdminRegister' element={<AdminRegister/>} />
+      <Route path='/AddAndRemove' element={<AddAndRemove />} />
  
       <Route path='*' element={<h1>404 Not Found</h1>} />
       
