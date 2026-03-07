@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { db } from "../firebase";
 import { Link } from "react-router-dom";
-import { collection, query, where, onSnapshot } from "firebase/firestore";
+import { collection, query, where, onSnapshot, doc, deleteDoc } from "firebase/firestore";
 import './StudentProfile.css';
 
 export const AddAndRemove = () => {
@@ -21,9 +21,13 @@ export const AddAndRemove = () => {
 
     return () => unsub();
   }, []);
-  const handleRemove = (id) => {
-    console.log("Remove admin with id:", id);
-    
+  const handleRemove = async (id) => {
+     try{
+      await deleteDoc(doc(db, "users", id));
+     }
+     catch (error) {
+      console.error("Error removing admin:", error);
+     }
     };
 
   return (
