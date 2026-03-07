@@ -21,6 +21,10 @@ export const AddAndRemove = () => {
 
     return () => unsub();
   }, []);
+  const handleRemove = (id) => {
+    console.log("Remove admin with id:", id);
+    
+    };
 
   return (
        <div className="table-container">
@@ -40,9 +44,9 @@ export const AddAndRemove = () => {
                   <tr key={admin.id}>
                     <td>{admin.name}</td>
                     <td>{admin.email}</td>
-                    <td style={{textAlign:'center'}}>
-                        🗑
-                    </td>
+                     <td style={{textAlign:'center'}}>
+                        <button onClick={() => handleRemove(admin.id)}>Remove</button>
+                     </td>
                   </tr>
                 ))}
             </tbody>
