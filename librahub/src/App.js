@@ -8,6 +8,7 @@ import { Main } from './Pages/Main';
 import { Admin } from './Pages/Admin';
 import AddBook from './Pages/AddBook';
 import AdminRegister  from './Pages/AdminRegister';
+import BooksTable from './Pages/bookstable';
  
 
 function App() {
@@ -21,6 +22,7 @@ function App() {
       <Route path='/Admin' element={<Admin/>} />
       <Route path='/add-book' element={<AddBook/>} />
       <Route path='/AdminRegister' element={<AdminRegister/>} />
+      <Route path='/books' element={<BooksTable/>} />
  
       <Route path='*' element={<h1>404 Not Found</h1>} />
       
