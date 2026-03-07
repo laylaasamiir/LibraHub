@@ -28,6 +28,7 @@ export const Admin = () => {
             </div>
 
         </div>
+        <button className="add-admin" title="Add New Admin">+</button>
     </div>
    
    </>
