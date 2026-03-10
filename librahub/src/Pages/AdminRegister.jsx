@@ -44,7 +44,6 @@ export default function AdminRegister() {
     if (!valid) return;
 
     try {
-
       const res = await createUserWithEmailAndPassword(auth, email, password);
 
       await setDoc(doc(db, "users", res.user.uid), {

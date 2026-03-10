@@ -85,7 +85,7 @@
   cursor:pointer;
 }
 .add-admin {
-    background-color: #e74c3c;
+    background-color: #0d6efd;
     color: white;
     border: none;
     border-radius: 8px;
@@ -116,3 +116,4 @@
 .borrow-table button:hover {
     filter: brightness(0.9);
 }
+
