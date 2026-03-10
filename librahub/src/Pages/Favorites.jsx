@@ -41,7 +41,7 @@ const Favorites = () => {
 
     return(
         <div className="home-container">
-            
+            <h1 className="home-title">My Favorites ❤️</h1>
             <div className="books-grid">
                 {favBooks.length > 0 ? (
                     favBooks.map((book) => (

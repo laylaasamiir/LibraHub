@@ -90,3 +90,5 @@
     font-weight: bold;
     font-size: 0.9rem;
 }
+.heart-empty { color: #ccc; }
+.heart-filled { color: red !important; } 
