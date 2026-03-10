@@ -27,18 +27,20 @@ return (
         <Route path="/favorites" element={<Favorites />} />
         <Route path="/StudentProfile" element={<StudentProfile />} />
       
-       <Route path='/StudentProfile' element={<StudentProfile/> } />
-      <Route path='/Borrow' element={<Borrow/>}/>
-      <Route path='login' element={<Login/>}/>
-      <Route path='Register' element={<Register/>}/>
-      <Route path='/' element={<Main/>}/>
-      <Route path='/Admin' element={<Admin/>} />
-      <Route path='/add-book' element={<AddBook/>} />
+       <Route path='/' element={<Main />} />
+      <Route path='/login' element={<Login />} />
+      <Route path='/register' element={<Register />} />
+      <Route path='/StudentProfile' element={<StudentProfile />} />
       <Route path='/complete-profile' element={<Complete />} />
-      <Route path='/AdminRegister' element={<AdminRegister/>} />
-      <Route path='/AddAndRemove' element={<AddAndRemove />} />
-      <Route path='*' element={<h1>404 Not Found</h1>} />
       
+      <Route path='/admin' element={<Admin />}>
+        <Route path='borrow' element={<Borrow />} />
+        <Route path='add-book' element={<AddBook />} />
+        <Route path='add-and-remove' element={<AddAndRemove />} />
+        <Route path='admin-register' element={<AdminRegister />} />
+      </Route>
+
+      <Route path='*' element={<h1>404 Not Found</h1>} />
     </Routes>
 
 
