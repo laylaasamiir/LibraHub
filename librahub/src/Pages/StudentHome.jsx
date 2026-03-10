@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import "./studentHome.css";
-import { collection, addDoc, getDocs } from "firebase/firestore";
+import { collection, addDoc, getDocs ,query,where,doc,deleteDoc} from "firebase/firestore";
 import { auth, db } from '../firebase';
 import { FaHeart } from 'react-icons/fa';
 
@@ -10,11 +10,39 @@ const StudentHome = () => {
     const [favBooks, setFavBooks] = useState([]);
 
     const handleToggleFavorite = async (book) => {
+       const userId = auth.currentUser ? auth.currentUser.uid : "user_123";
+       
         if (favBooks.includes(book.id)) {
-            setFavBooks(favBooks.filter(id => id !== book.id));
-        } else {
-            setFavBooks([...favBooks, book.id]);
+           setFavBooks(prev => prev.filter(id => id !== book.id));
             try {
+                const q = query(
+            collection(db, "favorites"), 
+            where("userId", "==", userId),
+            where("bookId", "==", book.id)
+        );
+        const querySnapshot = await getDocs(q);
+        querySnapshot.forEach(async (document) => {
+                await deleteDoc(doc(db, "favorites", document.id));
+            });
+
+console.log("Removed from favorites");
+        } catch (e) {
+            console.error("Error removing:", e);
+
+        setFavBooks(prev => [...prev, book.id]);
+        }
+        return;
+    }
+    setFavBooks(prev => [...prev, book.id]);
+
+        try {
+            const q = query(
+            collection(db, "favorites"), 
+            where("userId", "==", userId),
+            where("bookId", "==", book.id)
+        );
+        const existingDocs = await getDocs(q);
+        if (existingDocs.empty) {
                 await addDoc(collection(db, "favorites"), {
                     bookId: book.id,
                     title: book.title,
@@ -23,20 +51,30 @@ const StudentHome = () => {
                     userId: auth.currentUser ? auth.currentUser.uid : "user_123",
                     addedAt: new Date()
                 });
-            } catch (e) { console.error(e); }
+
+                console.log("Saved to firebase");
+           } } catch (e) { console.error(e); 
+              setFavBooks(prev => prev.filter(id => id !== book.id));
         }
     };
 
     useEffect(() => {
-        const fetchBooks = async () => {
+        const fetchBooksAndFavs = async () => {
             try {
-                const querySnapshot = await getDocs(collection(db, "books"));
-                const booksData = querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-                setBooks(booksData);
-                setLoading(false);
+               const booksSnapshot = await getDocs(collection(db, "books"));
+            const booksData = booksSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+            setBooks(booksData);
+                const userId = auth.currentUser ? auth.currentUser.uid : "user_123";
+            const q = query(collection(db, "favorites"), where("userId", "==", userId));
+            const favSnapshot = await getDocs(q);
+            const favIds = favSnapshot.docs.map(doc => doc.data().bookId);
+            setFavBooks(favIds);
+
+            setLoading(false);
+
             } catch (error) { setLoading(false); }
         };
-        fetchBooks();
+        fetchBooksAndFavs();
     }, []);
 
     if (loading) return <div className="loading"><h2>Loading... 📚</h2></div>;
