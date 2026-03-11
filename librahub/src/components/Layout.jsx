@@ -1,19 +1,16 @@
-import React from "react";
-import { Link,useNavigate } from "react-router-dom";
+import { Link,Outlet,useNavigate } from "react-router-dom";
 import "./Layout.css";
 import { FaUserCircle,FaHeart,FaHome,FaSignOutAlt } from "react-icons/fa";
+
 
 const Layout = () => {
     const navigate = useNavigate();
 
     return (
         <>
-        <header className="top-header">
-                <div className="logo">LibraHub 📚</div>
-                <Link to="/StudentProfile" className="profile-icon-link">
-                    <FaUserCircle size={30} />
-                </Link>
-            </header>
+       
+      
+           <Outlet/>
             <nav className="bottom-nav">
                 <Link to="/home" className="nav-item">
                     <FaHome size={24} />
@@ -28,6 +25,7 @@ const Layout = () => {
                     <span>Exit</span>
                 </div>
             </nav>
+          
         </>
     );
 };

@@ -93,7 +93,7 @@ const Login = () => {
 
       if (docSnap.exists()) {
         const userData = docSnap.data();
-        if (userData.role === "admin") navigate("/Admin");
+        if (userData.role === "admin") navigate("/Borrow");
         else navigate("/StudentProfile");
       } else {
         alert("No user data found.");
