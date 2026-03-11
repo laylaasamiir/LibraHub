@@ -12,6 +12,7 @@ import AdminRegister  from './Pages/AdminRegister';
 import Favorites from './Pages/Favorites';
 import StudentHome from './Pages/StudentHome';
 import Layout from './components/Layout';
+import BooksTable from './Pages/bookstable';
  
 
 function AppContent() {
@@ -35,6 +36,7 @@ return (
       <Route path='/Admin' element={<Admin />} />
       <Route path='/AddBook' element={<AddBook />} />
       <Route path='/Borrow' element={<Borrow/>} />
+      <Route path='books' element={<BooksTable />} />
  
       <Route path='*' element={<h1>404 Not Found</h1>} />
     </Routes>
