@@ -9,6 +9,9 @@ import { Admin } from './Pages/Admin';
 import AddBook from './Pages/AddBook';
 import { Complete } from './components/Complete';
 import AdminRegister  from './Pages/AdminRegister';
+import Favorites from './Pages/Favorites';
+import StudentHome from './Pages/StudentHome';
+import Layout from './components/Layout';
  
 
 function AppContent() {
@@ -17,19 +20,21 @@ function AppContent() {
   const showNavbar = !hideNavbarPaths.includes(location.pathname);
 return (
     <>
-      {showNavbar && <Layout />}
+      {showNavbar && <Layout/>}
       <Routes>
-        <Route path="/" element={<Login />} />
-        <Route path="/home" element={<StudentHome />} />
-        <Route path="/favorites" element={<Favorites />} />
+     
+        <Route path="/home" element={<StudentHome/>} />
+        <Route path="/favorites" element={<Favorites/>} />
         <Route path="/StudentProfile" element={<StudentProfile />} />
-      
        <Route path='/' element={<Main />} />
       <Route path='/login' element={<Login />} />
       <Route path='/register' element={<Register />} />
       <Route path='/StudentProfile' element={<StudentProfile />} />
       <Route path='/complete-profile' element={<Complete />} />
       <Route path='/AdminRegister' element={<AdminRegister/>} />
+      <Route path='/Admin' element={<Admin />} />
+      <Route path='/AddBook' element={<AddBook />} />
+      <Route path='/Borrow' element={<Borrow/>} />
  
       <Route path='*' element={<h1>404 Not Found</h1>} />
     </Routes>
