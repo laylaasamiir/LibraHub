@@ -92,3 +92,22 @@
 }
 .heart-empty { color: #ccc; }
 .heart-filled { color: red !important; } 
+
+
+
+.requested-btn {
+    background-color: #EAE0CF; 
+    color: #6b5e3b;
+}
+
+
+.borrowed-btn {
+    background-color: #8c95a3;
+    color: white;
+}
+
+
+.request-btn:disabled {
+    cursor: not-allowed;
+    opacity: 0.9;
+}

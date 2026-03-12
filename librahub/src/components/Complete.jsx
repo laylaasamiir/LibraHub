@@ -9,6 +9,7 @@ export const Complete = () => {
 
   const [level, setLevel] = useState("");
   const [department, setDepartment] = useState("");
+  const [studentCode, setStudentCode] = useState("");
 
   const navigate = useNavigate();
 
@@ -24,6 +25,7 @@ export const Complete = () => {
       await updateDoc(doc(db, "users", user.uid), {
         department: department,
         level: level,
+        studentCode: studentCode,
       });
 
       navigate("/StudentProfile");
@@ -43,6 +45,14 @@ export const Complete = () => {
           placeholder="Department"
           value={department}
           onChange={(e) => setDepartment(e.target.value)}
+          className="login-input"
+        />
+
+        <label className="login-label">Student Code</label>
+        <input
+          placeholder="Student Code"
+          value={studentCode}
+          onChange={(e) => setStudentCode(e.target.value)}
           className="login-input"
         />
 
