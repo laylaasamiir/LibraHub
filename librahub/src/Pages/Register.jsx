@@ -13,6 +13,7 @@ export default function Register() {
   const [department, setDepartment] = useState("");
   const [errorEmail, setErrorEmail] = useState("");
   const [errorPassword, setErrorPassword] = useState("");
+  const [studentCode, setStudentCode] = useState("");
   const [errorName, setErrorName] = useState("");
   const navigate = useNavigate();
 
@@ -21,7 +22,7 @@ export default function Register() {
     setErrorEmail("");
     setErrorPassword("");
     setErrorName("");
-     let valid = true;
+    let valid = true;
 
     if (!name) {
       setErrorName("Name is required");
@@ -49,34 +50,35 @@ export default function Register() {
         role: "student",
         department,
         level,
+        studentCode,
         createdAt: Date.now(),
       });
-       navigate("/StudentProfile");
+      navigate("/StudentProfile");
 
 
     } catch (e) {
-  switch (e.code) {
+      switch (e.code) {
 
-    case "auth/email-already-in-use":
-      setErrorEmail("Email already registered");
-      break;
+        case "auth/email-already-in-use":
+          setErrorEmail("Email already registered");
+          break;
 
-    case "auth/invalid-email":
-      setErrorEmail("Invalid email format");
-      break;
+        case "auth/invalid-email":
+          setErrorEmail("Invalid email format");
+          break;
 
-    case "auth/weak-password":
-      setErrorPassword("Password is too weak (min 6 characters)");
-      break;
+        case "auth/weak-password":
+          setErrorPassword("Password is too weak (min 6 characters)");
+          break;
 
-    case "auth/missing-password":
-      setErrorPassword("Password is required");
-      break;
+        case "auth/missing-password":
+          setErrorPassword("Password is required");
+          break;
 
-    default:
-      setErrorEmail("Something went wrong. Please try again.");
-  }
-}
+        default:
+          setErrorEmail("Something went wrong. Please try again.");
+      }
+    }
   };
 
   return (
@@ -100,6 +102,9 @@ export default function Register() {
 
               <label htmlFor="Department" className="login-label">Department</label>
               <input placeholder="Department" value={department} onChange={(e) => setDepartment(e.target.value)} className="login-input" />
+
+              <label htmlFor="stuCode" className="login-label">Student Code</label>
+              <input placeholder="Student Code" value={studentCode} onChange={(e) => setStudentCode(e.target.value)} className="login-input" />
 
               <label htmlFor="Level" className="login-label">Level</label>
               <select
