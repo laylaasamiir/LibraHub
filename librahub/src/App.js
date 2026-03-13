@@ -15,6 +15,7 @@ import Layout from './components/Layout';
 import BooksTable from './Pages/bookstable';
 import { AddAndRemove } from './Pages/AddAndRemove';
 import Header from './components/Header';
+import ConfirmTable from './Pages/confirmtable';
 
 
 function AppContent() {
@@ -47,7 +48,10 @@ function AppContent() {
         <Route path='/add-and-remove' element={<AddAndRemove />} />
         <Route path='/books' element={<BooksTable />} />
         <Route path='/AdminRegister' element={<AdminRegister />} />
+        <Route path="/confirm-table" element={<ConfirmTable/>}/>
         </Route>
+
+         
        
 
         <Route path='*' element={<h1>404 Not Found</h1>} />

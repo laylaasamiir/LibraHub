@@ -12,8 +12,14 @@ import {
 } from "firebase/firestore";
 import { FaUser, FaLock } from "react-icons/fa";
 import { db } from "../firebase";
+ 
+
+ 
 
 const Borrow = () => {
+    
+ 
+    
     const [borrowData, setBorrowData] = useState({
         studentName: "",
         studentCode: "",
@@ -155,6 +161,9 @@ const Borrow = () => {
 
     return (
         <>
+ 
+
+
             <div className="borrow-page">
                 <div className="borrow-card">
                     <h2>Borrow Book</h2>
