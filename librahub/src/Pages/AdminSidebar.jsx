@@ -12,6 +12,7 @@ export const AdminSidebar = () => {
         <Link to={"/AddBook"}>Add New Books</Link>
         <Link to={"/AdminRegister"}>Add New Admin</Link>
          <Link to={"/books"}>Book Management</Link>
+         <Link to="/confirm-table">Confirm Table</Link>
       </div>
       <div className='content'>
         <Outlet />
