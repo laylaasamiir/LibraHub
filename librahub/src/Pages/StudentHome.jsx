@@ -1,14 +1,15 @@
 import React, { useState, useEffect } from "react";
 import "./studentHome.css";
-import { collection, addDoc, getDocs, query, where, doc, deleteDoc, getDoc, serverTimestamp } from "firebase/firestore";
+import { collection, addDoc, getDocs, query, where, doc, deleteDoc, getDoc, serverTimestamp , orderBy, startAt, endAt} from "firebase/firestore";
 import { auth, db } from '../firebase';
-import { FaHeart } from 'react-icons/fa';
+import { FaHeart ,FaSearch} from 'react-icons/fa';
 
 const StudentHome = () => {
     const [books, setBooks] = useState([]);
     const [loading, setLoading] = useState(true);
     const [favBooks, setFavBooks] = useState([]);
     const [requestedBooks, setRequestedBooks] = useState([]);
+    const [searchTerm, setSearchTerm] = useState("");
 
     const handleToggleFavorite = async (book) => {
         const userId = auth.currentUser ? auth.currentUser.uid : "user_123";
@@ -97,9 +98,20 @@ const StudentHome = () => {
 
  useEffect(() => {
     const fetchBooksAndFavs = async () => {
-        try {
 
-            const booksSnapshot = await getDocs(collection(db, "books"));
+        try {
+            let q;
+            if (searchTerm.trim() !== "") {
+                q = query(
+                    collection(db, "books"),
+                    orderBy("title"),
+                    startAt(searchTerm),
+                    endAt(searchTerm + "\uf8ff")
+                );
+            } else {
+                q = collection(db, "books");
+            }
+            const booksSnapshot = await getDocs(q);
             const booksData = booksSnapshot.docs.map(doc => ({
                 id: doc.id,
                 ...doc.data()
@@ -113,7 +125,7 @@ const StudentHome = () => {
             );
 
             const favSnapshot = await getDocs(favQuery);
-            const favIds = favSnapshot.docs.map(doc => doc.data().bookId);
+            const favIds = favSnapshot.docs.map(doc => String(doc.data().bookId));
             setFavBooks(favIds);
 
             
@@ -136,21 +148,34 @@ const StudentHome = () => {
             setLoading(false);
         }
     };
-
-    fetchBooksAndFavs();
-}, []);
-
-
+    const timeOutId = setTimeout(() => {
+        fetchBooksAndFavs();}, 400);
+    return () => clearTimeout(timeOutId);
+}, [searchTerm]);
+const filteredBooks = books;
     if (loading) return <div className="loading"><h2>Loading... 📚</h2></div>;
+
+    
 
     return (
         <div className="home-container">
             <h1 className="home-title">Available Books 📚</h1>
+            
+            <div className="search-bar">
+                <FaSearch className="search-icon" />
+                <input 
+                    type="text" 
+                    placeholder="Search ..." 
+                    value={searchTerm}
+                    onChange={(e) => setSearchTerm(e.target.value)}
+                />
+            </div>
+            
             <div className="books-grid">
-                {books.map((book) => (
+                {filteredBooks.map((book) => (
                     <div key={book.id} className="book-card">
                         <div className="favorite-icon" onClick={() => handleToggleFavorite(book)}>
-                            <FaHeart className={favBooks.includes(book.id) ? "heart-filled" : "heart-empty"} />
+                            <FaHeart className={favBooks.includes(String(book.id)) ? "heart-filled" : "heart-empty"} />
                         </div>
                         <img src={book.image || "https://via.placeholder.com/150"} alt={book.title} className="book-image" />
                         <div className="book-info">
