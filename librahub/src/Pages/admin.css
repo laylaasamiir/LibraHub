@@ -1,111 +1,40 @@
-
-body {
+.Admin{
+    display:flex;
+    height:100vh;
+    padding: 0;
     margin: 0;
-    font-family: Arial, sans-serif;
-    background: linear-gradient(to right, #f4f6f9, #e8ecf2);
+}
+.sidebar{
+    background-color:#0d6efd;
     display: flex;
-    justify-content: center;
-    align-items: center;
+    flex-direction: column;
+    width: 240px;
     height: 100vh;
-}
+    margin-top: 50px;
+    position:fixed;
+    top:0;
+    left:0;
 
-.container {
-    background: #fff;
-    padding: 40px;
-    border-radius: 20px;
-    text-align: center;
-    width: 800px;
-    box-shadow: 0 10px 30px rgba(0,0,0,0.1);
 }
+.sidebar a{
+    color:white;
+    text-decoration:none;
+    padding: 15px 20px;
+    font-size: 18px;
+}       
+.sidebar h1{
+    color: aliceblue;
+    font-weight: 700;
+    margin-bottom: 20px;
+    padding: 20px;
 
-h1 {
-    margin-bottom: 10px;
 }
-
-h2 {
-    margin-bottom: 30px;
+.sidebar a:hover{
+background-color:rgba(255,255,255,0.2);
 }
-
-.boxs {
-    display: flex;
-    justify-content: space-between;
-    gap: 20px;
-}
-
-.light {
-    flex: 1;
-    background: #f4f8ff;
-    padding: 30px;
-    border-radius: 15px;
-    transition: 0.3s;
-}
-.dark {
-    flex: 1;
-    background: #f5f7fb;
-    padding: 30px;
-    border-radius: 15px;
-    transition: 0.3s;
-}
-
-.dark {
-    background: #3d5a80;
-    color: white;
-}
-
-.light img {
-    width: 180px;
-    margin-bottom: 60px;
-}
-.dark img {
-    width: 180px;
-    margin-bottom: 60px;
-}
-
-.dark button {
-    margin-top: 20px;
-    padding: 10px 20px;
-    border: none;
-    border-radius: 8px;
-    background: #6f8cb8;
-    color: white;
-    cursor:pointer;
-    transition: 0.3s;
-}
-.light button {
-    margin-top: 20px;
-    padding: 10px 20px;
-    border: none;
-    border-radius: 8px;
-    background: #4f6d9b;
-    color: white;
-    cursor:pointer;
-    transition: 0.3s;
-}
-
-.dark button:hover {
-    background: #2e4a73;
-}
-
-.light button:hover {
-    background: #2e4a73;
-}
-.dark:hover {
-    transform: translateY(-5px);
-}
-.light:hover {
-    transform: translateY(-5px);
-}
-.add-admin{
-    position: fixed;
-    right: 30px;
-    bottom: 30px;
-    width: 60px;
-    height: 60px;
-    border-radius: 50%;
-    background-color: #2e5c88;
-    color: white;
-    font-size: 28px;
-    border: none;
-    cursor: pointer;
-    box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+.content{
+    flex:1;
+    margin-left: 240px;
+    padding: 20px;
+    background-color: #f5f5f5;
 }

@@ -59,3 +59,41 @@
 .save-btn:hover {
     background-color: #1e4d82;
 }
+
+
+
+.books-table{
+  width:100%;
+  border-collapse: collapse;
+  margin-top:20px;
+}
+
+.books-table th,
+.books-table td{
+  border:1px solid #ddd;
+  padding:10px;
+  text-align:center;
+}
+
+.books-table th{
+  background:#f4f4f4;
+}
+
+.delete-btn{
+  background:#e74c3c;
+  color:white;
+  border:none;
+  padding:6px 10px;
+  margin-right:5px;
+  cursor:pointer;
+  border-radius:4px;
+}
+
+.print-btn{
+  background:#3498db;
+  color:white;
+  border:none;
+  padding:6px 10px;
+  cursor:pointer;
+  border-radius:4px;
+}
