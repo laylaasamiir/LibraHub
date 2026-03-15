@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from "react";
 import { db } from "../firebase";
-import { Link } from "react-router-dom";
 import { collection, query, where, onSnapshot } from "firebase/firestore";
 import './StudentProfile.css';
 
@@ -33,6 +32,7 @@ export const AddAndRemove = () => {
                     <th>Name</th>
                     <th>Email</th>
                     <th>Remove</th>
+          
                 </tr>
             </thead>
             <tbody>
@@ -41,15 +41,13 @@ export const AddAndRemove = () => {
                     <td>{admin.name}</td>
                     <td>{admin.email}</td>
                     <td style={{textAlign:'center'}}>
-                        🗑
+                      <button className="remove-btn">-</button>
                     </td>
                   </tr>
                 ))}
             </tbody>
         </table>
-        <Link to="/AdminRegister">
-        <button className="add-admin" title="Add New Admin">+</button>
-        </Link>
+      
        </div>
   );
 };
