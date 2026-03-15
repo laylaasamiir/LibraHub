@@ -29,7 +29,6 @@
     margin-bottom: 20px;
   }
   
-  
   .borrow-card input[type="text"] {
     width: 100%;
     padding: 12px;
@@ -138,4 +137,8 @@
     border-top: 1px solid #eee;
     font-size: 14px;
   }
-  
+  .message{
+  margin-top:20px;
+  font-size:20px;
+  font-weight:600;
+}
