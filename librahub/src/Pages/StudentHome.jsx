@@ -37,13 +37,6 @@ const StudentHome = () => {
         setFavBooks(prev => [...prev, book.id]);
 
         try {
-            const q = query(
-                collection(db, "favorites"),
-                where("userId", "==", userId),
-                where("bookId", "==", book.id)
-            );
-            const existingDocs = await getDocs(q);
-            if (existingDocs.empty) {
                 await addDoc(collection(db, "favorites"), {
                     bookId: book.id,
                     title: book.title,
@@ -54,77 +47,11 @@ const StudentHome = () => {
                 });
 
                 console.log("Saved to firebase");
-            }
         } catch (e) {
             console.error(e);
             setFavBooks(prev => prev.filter(id => id !== book.id));
         }
     };
-    useEffect(() => {
-    const fetchBooksAndFavs = async () => {
-        try {
-
-            const booksSnapshot = await getDocs(collection(db, "books"));
-            const booksData = booksSnapshot.docs.map(doc => ({
-                id: doc.id,
-                ...doc.data()
-            }));
-            setBooks(booksData);
-
-            const userId = auth.currentUser ? auth.currentUser.uid : "user_123";
-
-            
-            const favQuery = query(
-                collection(db, "favorites"),
-                where("userId", "==", userId)
-            );
-
-            const favSnapshot = await getDocs(favQuery);
-            const favIds = favSnapshot.docs.map(doc => doc.data().bookId);
-            setFavBooks(favIds);
-
-            
-            const reqQuery = query(
-                collection(db, "borrowRequests"),
-                where("studentId", "==", userId),
-                where("status", "==", "pending")
-            );
-
-            const reqSnapshot = await getDocs(reqQuery);
-
-            const reqIds = reqSnapshot.docs.map(doc => doc.data().bookId);
-
-            setRequestedBooks(reqIds);
-
-            setLoading(false);
-
-        } catch (error) {
-            console.error(error);
-            setLoading(false);
-        }
-    };
-
-    fetchBooksAndFavs();
-}, []);
-
-    useEffect(() => {
-        const fetchBooksAndFavs = async () => {
-            try {
-                const booksSnapshot = await getDocs(collection(db, "books"));
-                const booksData = booksSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-                setBooks(booksData);
-                const userId = auth.currentUser ? auth.currentUser.uid : "user_123";
-                const q = query(collection(db, "favorites"), where("userId", "==", userId));
-                const favSnapshot = await getDocs(q);
-                const favIds = favSnapshot.docs.map(doc => doc.data().bookId);
-                setFavBooks(favIds);
-
-                setLoading(false);
-
-            } catch (error) { setLoading(false); }
-        };
-        fetchBooksAndFavs();
-    }, []);
     const handleRequest = async (book) => {
         try {
             const user = auth.currentUser;
@@ -167,6 +94,52 @@ const StudentHome = () => {
 
 
     }
+
+ useEffect(() => {
+    const fetchBooksAndFavs = async () => {
+        try {
+
+            const booksSnapshot = await getDocs(collection(db, "books"));
+            const booksData = booksSnapshot.docs.map(doc => ({
+                id: doc.id,
+                ...doc.data()
+            }));
+            setBooks(booksData);
+
+            if (auth.currentUser) {
+            const userId = auth.currentUser ? auth.currentUser.uid : "user_123";
+            const favQuery = query(collection(db, "favorites"),
+                where("userId", "==", userId)
+            );
+
+            const favSnapshot = await getDocs(favQuery);
+            const favIds = favSnapshot.docs.map(doc => doc.data().bookId);
+            setFavBooks(favIds);
+
+            
+            const reqQuery = query(
+                collection(db, "borrowRequests"),
+                where("studentId", "==", userId),
+                where("status", "==", "pending")
+            );
+
+            const reqSnapshot = await getDocs(reqQuery);
+
+            const reqIds = reqSnapshot.docs.map(doc => doc.data().bookId);
+
+            setRequestedBooks(reqIds);
+        }
+            setLoading(false);
+
+        } catch (error) {
+            console.error(error);
+            setLoading(false);
+        }
+    };
+
+    fetchBooksAndFavs();
+}, []);
+
 
     if (loading) return <div className="loading"><h2>Loading... 📚</h2></div>;
 
