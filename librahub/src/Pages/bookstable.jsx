@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { collection, getDocs, deleteDoc, doc, updateDoc } from "firebase/firestore";
+import { collection, getDocs, deleteDoc, doc } from "firebase/firestore";
 import { db } from "../firebase";
 import "./addBook.css";
 
@@ -29,14 +29,6 @@ const BooksTable = () => {
 
   const printCode = (code) => {
     alert("Book Code: " + code);
-  };
-
-  const editBook = async (id, updatedData) => {
-    const bookRef = doc(db, "books", id);
-  
-    await updateDoc(bookRef, updatedData);
-  
-    fetchBooks();  
   };
 
   return (
@@ -77,21 +69,6 @@ const BooksTable = () => {
                   >
                     PrintCode
                   </button>
-
-                  <button
-                  className="edit-btn"
-                  onClick={() => {
-                    const newTitle = prompt("Enter new title:", book.title);
-                    const newAuthor = prompt("Enter new author:", book.author);
-
-                    editBook(book.id, {
-                      title: newTitle,
-                      author: newAuthor
-                    });
-                  }}
-                >
-                  Edit
-                </button>
                 </td>
 
               </tr>
