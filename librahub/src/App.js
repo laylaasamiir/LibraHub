@@ -16,6 +16,7 @@ import BooksTable from './Pages/bookstable';
 import { AddAndRemove } from './Pages/AddAndRemove';
 import Header from './components/Header';
 import ConfirmTable from './Pages/confirmtable';
+import Reviews from './Pages/Reviews';
 
 
 function AppContent() {
@@ -51,7 +52,7 @@ function AppContent() {
         <Route path="/confirm-table" element={<ConfirmTable/>}/>
         </Route>
 
-         
+        
        
 
         <Route path='*' element={<h1>404 Not Found</h1>} />

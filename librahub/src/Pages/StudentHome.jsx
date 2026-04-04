@@ -2,7 +2,12 @@ import React, { useState, useEffect } from "react";
 import "./studentHome.css";
 import { collection, addDoc, getDocs, query, where, doc, deleteDoc, getDoc, serverTimestamp , orderBy, startAt, endAt} from "firebase/firestore";
 import { auth, db } from '../firebase';
+<<<<<<< Updated upstream
 import { FaHeart ,FaSearch} from 'react-icons/fa';
+=======
+import { FaHeart } from 'react-icons/fa';
+import Reviews from "./Reviews";
+>>>>>>> Stashed changes
 
 const StudentHome = () => {
     const [books, setBooks] = useState([]);
@@ -26,11 +31,7 @@ const StudentHome = () => {
                 querySnapshot.forEach(async (document) => {
                     await deleteDoc(doc(db, "favorites", document.id));
                 });
-
-                console.log("Removed from favorites");
             } catch (e) {
-                console.error("Error removing:", e);
-
                 setFavBooks(prev => [...prev, book.id]);
             }
             return;
@@ -46,33 +47,22 @@ const StudentHome = () => {
                     userId: auth.currentUser ? auth.currentUser.uid : "user_123",
                     addedAt: new Date()
                 });
-
-                console.log("Saved to firebase");
         } catch (e) {
-            console.error(e);
             setFavBooks(prev => prev.filter(id => id !== book.id));
         }
     };
+
     const handleRequest = async (book) => {
         try {
             const user = auth.currentUser;
-            if (!user) {
-                alert("Please log in to request books.");
-                return;
-            }
+            if (!user) return;
 
             const userRef = doc(db, "users", user.uid);
             const userSnap = await getDoc(userRef);
 
-            if (!userSnap.exists()) {
-                alert("Student data not found");
-                return;
-            }
+            if (!userSnap.exists()) return;
 
             const studentData = userSnap.data();
-
-
-
 
             await addDoc(collection(db, "borrowRequests"), {
                 studentId: user.uid,
@@ -85,17 +75,10 @@ const StudentHome = () => {
                 requestedAt: serverTimestamp()
             });
             setRequestedBooks(prev => [...prev, book.id]);
-
-            alert("Request sent successfully");
-
-        } catch (error) {
-            console.error("Error sending request:", error);
-            alert("Failed to send request");
-        }
-
-
+        } catch (error) {}
     }
 
+<<<<<<< Updated upstream
  useEffect(() => {
     const fetchBooksAndFavs = async () => {
 
@@ -117,13 +100,29 @@ const StudentHome = () => {
                 ...doc.data()
             }));
             setBooks(booksData);
+=======
+    useEffect(() => {
+        const fetchBooksAndFavs = async () => {
+            try {
+                const booksSnapshot = await getDocs(collection(db, "books"));
+                const booksData = booksSnapshot.docs.map(doc => ({
+                    id: doc.id,
+                    ...doc.data()
+                }));
+                setBooks(booksData);
 
-            if (auth.currentUser) {
-            const userId = auth.currentUser ? auth.currentUser.uid : "user_123";
-            const favQuery = query(collection(db, "favorites"),
-                where("userId", "==", userId)
-            );
+                if (auth.currentUser) {
+                    const userId = auth.currentUser ? auth.currentUser.uid : "user_123";
+                    const favQuery = query(collection(db, "favorites"),
+                        where("userId", "==", userId)
+                    );
+>>>>>>> Stashed changes
 
+                    const favSnapshot = await getDocs(favQuery);
+                    const favIds = favSnapshot.docs.map(doc => doc.data().bookId);
+                    setFavBooks(favIds);
+
+<<<<<<< Updated upstream
             const favSnapshot = await getDocs(favQuery);
             const favIds = favSnapshot.docs.map(doc => String(doc.data().bookId));
             setFavBooks(favIds);
@@ -153,6 +152,27 @@ const StudentHome = () => {
     return () => clearTimeout(timeOutId);
 }, [searchTerm]);
 const filteredBooks = books;
+=======
+                    const reqQuery = query(
+                        collection(db, "borrowRequests"),
+                        where("studentId", "==", userId),
+                        where("status", "==", "pending")
+                    );
+
+                    const reqSnapshot = await getDocs(reqQuery);
+                    const reqIds = reqSnapshot.docs.map(doc => doc.data().bookId);
+                    setRequestedBooks(reqIds);
+                }
+                setLoading(false);
+            } catch (error) {
+                setLoading(false);
+            }
+        };
+
+        fetchBooksAndFavs();
+    }, []);
+
+>>>>>>> Stashed changes
     if (loading) return <div className="loading"><h2>Loading... 📚</h2></div>;
 
     
@@ -182,7 +202,6 @@ const filteredBooks = books;
                             <h3>{book.title}</h3>
                             <p className="author">By: {book.author}</p>
                             <p className="description">{book.description}</p>
-
                             <button
                                 className={`request-btn ${book.isBorrowed
                                         ? "borrowed-btn"
@@ -203,6 +222,8 @@ const filteredBooks = books;
                     </div>
                 ))}
             </div>
+
+            <Reviews />
         </div>
     );
 };
