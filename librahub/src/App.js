@@ -17,7 +17,6 @@ import { AddAndRemove } from './Pages/AddAndRemove';
 import Header from './components/Header';
 import ConfirmTable from './Pages/confirmtable';
 import BookDetails from './Pages/BookDetails';
-import Reviews from './Pages/Reviews';
 
 
 function AppContent() {
@@ -37,7 +36,7 @@ function AppContent() {
 
        <Route element={<Layout />}>
         <Route path="/home" element={<StudentHome />} />
-        <Route path="/book-details" element={<BookDetails />} />
+        <Route path="/book-details" element={<BookDetails/>} />
         <Route path="/favorites" element={<Favorites />} />
         <Route path='/StudentProfile' element={<StudentProfile />} />
 
@@ -52,10 +51,6 @@ function AppContent() {
         <Route path='/AdminRegister' element={<AdminRegister />} />
         <Route path="/confirm-table" element={<ConfirmTable/>}/>
         </Route>
-
-         
-       
-
 
          
        
