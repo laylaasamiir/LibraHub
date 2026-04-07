@@ -17,6 +17,7 @@ import { AddAndRemove } from './Pages/AddAndRemove';
 import Header from './components/Header';
 import ConfirmTable from './Pages/confirmtable';
 import BookDetails from './Pages/BookDetails';
+import AdminRequests from './components/AdminRequest';
 
 
 function AppContent() {
@@ -50,6 +51,7 @@ function AppContent() {
         <Route path='/books' element={<BooksTable />} />
         <Route path='/AdminRegister' element={<AdminRegister />} />
         <Route path="/confirm-table" element={<ConfirmTable/>}/>
+        <Route path='/AdminRqu' element={<AdminRequests />} />
         </Route>
 
          

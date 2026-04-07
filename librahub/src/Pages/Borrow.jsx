@@ -12,6 +12,7 @@ import {
 } from "firebase/firestore";
 import { FaUser, FaLock } from "react-icons/fa";
 import { db } from "../firebase";
+import AdminRequests from '../components/AdminRequest';
  
 
  
@@ -220,6 +221,7 @@ const Borrow = () => {
                     </div>
                 </div>
             </div>
+            <AdminRequests/>
 
 
 

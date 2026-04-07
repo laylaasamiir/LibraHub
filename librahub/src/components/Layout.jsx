@@ -1,6 +1,7 @@
 import { Link,Outlet,useNavigate } from "react-router-dom";
 import "./Layout.css";
 import { FaUserCircle,FaHeart,FaHome,FaSignOutAlt } from "react-icons/fa";
+import ReviewsSidebar from "../Pages/Reviews";
 
 
 const Layout = () => {
@@ -25,7 +26,7 @@ const Layout = () => {
                     <span>Exit</span>
                 </div>
             </nav>
-          
+          <ReviewsSidebar/>
         </>
     );
 };
