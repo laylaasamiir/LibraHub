@@ -20,7 +20,7 @@ body {
   top: 0;
   left: -350px;
   width: 350px;
-  height: 100%;
+  height: calc(100% - 60px);
   background: white;
   box-shadow: 2px 0 10px rgba(0,0,0,0.2);
   padding: 20px;
