@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { collection, getDocs } from "firebase/firestore";
+import { collection, doc, getDocs, updateDoc } from "firebase/firestore";
 import { db } from "../firebase";
 import "./addBook.css";
 
@@ -19,7 +19,14 @@ const ConfirmTable = () => {
     fetchBorrowedBooks();
   }, []);
 
-  
+  const handleReturn =async(id ) =>{
+    await updateDoc(doc(db,"borrowedBooks",id), {
+      returnAt: new Date(),
+     
+    });
+    fetchBorrowedBooks();
+
+  };
   
 
   return (
@@ -34,6 +41,8 @@ const ConfirmTable = () => {
               <th>Student Name</th>
               <th>Book Title</th>
               <th>Borrow At</th>
+              <th>Return At</th>
+              <th>Status</th>
             </tr>
           </thead>
 
@@ -42,8 +51,28 @@ const ConfirmTable = () => {
               <tr key={index}>
                 <td>{book.studentName}</td>
                 <td>{book.bookTitle}</td>
-                <td>{book.borrowAt}</td>
-              </tr>
+ 
+                <td>{book.borrowedAt ? book.borrowedAt.toDate().toLocaleString(): "loading..."}</td>
+                <td>
+                    {book.returnAt ? (book.returnAt.toDate? book.returnAt.toDate().toLocaleString(): book.returnAt.toLocaleString()) : "Still Borrowed"}
+                </td>
+
+                 <td
+                       style={{
+                        color: book.returnAt ? "green" : "red",
+                         fontWeight: "bold"
+                              }}  >
+                         {book.returnAt ?( "Returned") : (
+                          <>
+                          Borrowed
+                          <br />
+                          <button onClick={()=> handleReturn(book.id)}>
+                            Return
+                          </button>
+
+                            </>)}
+                   </td>
+                  </tr>
             ))}
           </tbody>
         </table>
