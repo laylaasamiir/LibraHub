@@ -1,14 +1,42 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import "./Reviews.css";
+import { collection, addDoc, query, orderBy, onSnapshot } from "firebase/firestore";
+import { db, auth } from "../firebase";
 
 export default function ReviewsSidebar() {
   const [reviews, setReviews] = useState("");
   const [submittedReviews, setSubmittedReviews] = useState([]);
   const [isOpen, setIsOpen] = useState(false);
 
+  useEffect(() => {
+    const q = query(collection(db, "reviews"), orderBy("createdAt", "desc"));
+
+    const unsubscribe = onSnapshot(q, (snapshot) => {
+      const data = snapshot.docs.map(doc => ({
+        id: doc.id,
+        ...doc.data()
+      }));
+      setSubmittedReviews(data);
+    });
+
+    return () => unsubscribe();
+  }, []);
+
+  const handleSubmit = async () => {
+    if (!reviews.trim()) return;
+    await auth.currentUser.reload();
+
+    await addDoc(collection(db, "reviews"), {
+      text: reviews,
+      name: auth.currentUser?.displayName || "Anonymous",
+      createdAt: new Date()
+  });
+
+    setReviews("");
+  };
+
   return (
     <>
-
       <button className="toggle-button" onClick={() => setIsOpen(!isOpen)}>
         {isOpen ? "Close Reviews" : "Open Reviews"}
       </button>
@@ -17,9 +45,10 @@ export default function ReviewsSidebar() {
         <h2>Reviews</h2>
 
         <div className="reviews-list">
-          {submittedReviews.map((review, index) => (
-            <div className="review" key={index}>
-              <p>{review}</p>
+          {submittedReviews.map((review) => (
+            <div className="review" key={review.id}>
+              <h4>{review.name}</h4>
+              <p>{review.text}</p>
             </div>
           ))}
         </div>
@@ -29,13 +58,8 @@ export default function ReviewsSidebar() {
           onChange={(e) => setReviews(e.target.value)}
           placeholder="Write a review..."
         />
-        <button
-          onClick={() => {
-            if (!reviews.trim()) return;
-            setSubmittedReviews([...submittedReviews, reviews]);
-            setReviews("");
-          }}
-        >
+
+        <button onClick={handleSubmit}>
           Submit
         </button>
       </div>
