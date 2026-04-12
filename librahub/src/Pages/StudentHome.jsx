@@ -42,7 +42,7 @@ const StudentHome = () => {
                     bookId: book.id,
                     title: book.title,
                     author: book.author,
-                    image: book.image || "",
+                   image: book.coverUrl || book.image || "",
                     userId: auth.currentUser ? auth.currentUser.uid : "user_123",
                     addedAt: new Date()
                 });
@@ -177,7 +177,7 @@ const filteredBooks = books;
                         <div className="favorite-icon" onClick={() => handleToggleFavorite(book)}>
                             <FaHeart className={favBooks.includes(String(book.id)) ? "heart-filled" : "heart-empty"} />
                         </div>
-                        <img src={book.image || "https://via.placeholder.com/150"} alt={book.title} className="book-image" />
+                       <img src={book.coverUrl || book.image || "https://via.placeholder.com/150"} alt={book.title} className="book-image" />
                         <div className="book-info">
                             <h3>{book.title}</h3>
                             <p className="author">By: {book.author}</p>
