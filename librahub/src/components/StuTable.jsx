@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react'
 import '../Pages/StudentProfile.css'
-import { collection, getDocs  } from "firebase/firestore"; 
+import { collection, getDocs, query, where } from "firebase/firestore"; 
 import { auth, db } from "../firebase";
 import { onAuthStateChanged } from "firebase/auth";  
 
@@ -9,37 +9,40 @@ export const StuTable = () => {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-   
-    const unsubscribe = onAuthStateChanged(auth, (user) => {
+
+    const unsubscribe = onAuthStateChanged(auth, async (user) => {
       if (user) {
-        fetchBooks(user.uid);
+        try {
+          const q = query(
+            collection(db, "borrowedBooks"),
+            where("userId", "==", user.uid)  
+          );
+
+          const querySnapshot = await getDocs(q);
+
+          const data = querySnapshot.docs.map(doc => ({
+            id: doc.id,
+            ...doc.data()
+          }));
+
+          setBooks(data);
+
+        } catch (error) {
+          console.error("Error fetching books:", error);
+        } finally {
+          setLoading(false);
+        }
+
       } else {
         setBooks([]);
         setLoading(false);
       }
     });
 
-    const fetchBooks = async (uid) => {
-      try {
-        const querySnapshot = await getDocs(collection(db, "borrowedBooks"));
-        
-        const data = querySnapshot.docs
-          .map(doc => ({ id: doc.id, ...doc.data() }))
-       
-          .filter(book => book && book.userId === uid);
-
-        setBooks(data);
-      } catch (error) {
-        console.error("Error fetching books:", error);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    return () => unsubscribe();  
+    return () => unsubscribe();
   }, []);
 
-  if (loading) return <p>Loading...</p>;  
+  if (loading) return <p>Loading...</p>;
 
   return (
     <div className="pc-card">
@@ -53,6 +56,7 @@ export const StuTable = () => {
             <th>Status</th>
           </tr>
         </thead>
+
         <tbody>
           {books.length === 0 ? (
             <tr>
@@ -63,16 +67,19 @@ export const StuTable = () => {
               <tr key={book.id}>
                 <td>{index + 1}</td>
                 <td>{book.bookTitle}</td>
+
                 <td>
-                  {book.borrowedAt?.seconds 
-                    ? new Date(book.borrowedAt.seconds * 1000).toLocaleDateString() 
+                  {book.borrowedAt?.seconds
+                    ? new Date(book.borrowedAt.seconds * 1000).toLocaleString()
                     : "-"}
                 </td>
+
                 <td>
-                  {book.returnAt?.seconds 
-                    ? new Date(book.returnAt.seconds * 1000).toLocaleDateString() 
+                  {book.returnedAt?.seconds
+                    ? new Date(book.returnedAt.seconds * 1000).toLocaleString()
                     : "Not returned"}
                 </td>
+
                 <td>{book.status}</td>
               </tr>
             ))
@@ -80,5 +87,5 @@ export const StuTable = () => {
         </tbody>
       </table>
     </div>
-  )
+  );
 }

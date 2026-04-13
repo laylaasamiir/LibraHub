@@ -11,7 +11,7 @@ import {
     serverTimestamp
 } from "firebase/firestore";
 import { FaUser, FaLock } from "react-icons/fa";
-import { db } from "../firebase";
+import { auth, db } from "../firebase";
 import AdminRequests from '../components/AdminRequest';
  
 
@@ -64,6 +64,7 @@ const Borrow = () => {
             await addDoc(collection(db, "borrowedBooks"), {
                 studentName: borrowData.studentName,
                 studentCode: borrowData.studentCode,
+                userId: auth.currentUser.uid,
                 bookCode: Number(borrowData.bookCode),
                 bookDocId: bookDoc.id,
                 bookTitle: bookData.title,
