@@ -18,6 +18,8 @@ import Header from './components/Header';
 import ConfirmTable from './Pages/confirmtable';
 import BookDetails from './Pages/BookDetails';
 import AdminRequests from './components/AdminRequest';
+import AiAddBook from './Pages/AiAddBook';
+import AdminAddBook from './Pages/AdminAddBook';
 
 
 function AppContent() {
@@ -52,6 +54,8 @@ function AppContent() {
         <Route path='/AdminRegister' element={<AdminRegister />} />
         <Route path="/confirm-table" element={<ConfirmTable/>}/>
         <Route path='/AdminRqu' element={<AdminRequests />} />
+        <Route path='/AiAddBook' element={<AiAddBook/>}/>\
+        <Route path='/AdminAddBook' element={<AdminAddBook/>}/>
         </Route>
 
          
