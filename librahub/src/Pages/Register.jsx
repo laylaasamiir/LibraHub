@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { createUserWithEmailAndPassword } from "firebase/auth";
 import { auth, db } from "../firebase";
 import { doc, setDoc } from "firebase/firestore";
+import { updateProfile } from "firebase/auth";
 import '../Pages/login.css'
 import { Link, useNavigate } from "react-router-dom";
 
@@ -43,6 +44,10 @@ export default function Register() {
 
     try {
       const res = await createUserWithEmailAndPassword(auth, email, password);
+
+      await updateProfile(res.user, {
+        displayName: name
+      });
 
       await setDoc(doc(db, "users", res.user.uid), {
         name,
