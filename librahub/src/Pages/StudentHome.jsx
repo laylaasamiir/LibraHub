@@ -2,14 +2,22 @@ import React, { useState, useEffect } from "react";
 import "./studentHome.css";
 import { collection, addDoc, getDocs, query, where, doc, deleteDoc, getDoc, serverTimestamp , orderBy, startAt, endAt} from "firebase/firestore";
 import { auth, db } from '../firebase';
-import { FaHeart ,FaSearch} from 'react-icons/fa';
+import { FaHeart, FaSearch, FaFilter } from 'react-icons/fa';
+import { useLocation } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 
 const StudentHome = () => {
+    const navigate = useNavigate();
     const [books, setBooks] = useState([]);
     const [loading, setLoading] = useState(true);
     const [favBooks, setFavBooks] = useState([]);
     const [requestedBooks, setRequestedBooks] = useState([]);
     const [searchTerm, setSearchTerm] = useState("");
+    const [selectedCategory, setSelectedCategory] = useState("All");
+    const [categories, setCategories] = useState([]);
+    const [categorySearch, setCategorySearch] = useState("");
+    const [showFilter, setShowFilter] = useState(false);
+    const location = useLocation();
 
   const handleToggleFavorite = async (book) => {
     const userId = auth.currentUser ? auth.currentUser.uid : "user_123";
@@ -96,6 +104,12 @@ const StudentHome = () => {
 
     }
 
+    useEffect(() => {
+        if (location.state?.resetCategory) {
+            setSelectedCategory("All");
+        }
+    }, [location]);
+
  useEffect(() => {
     const fetchBooksAndFavs = async () => {
 
@@ -116,7 +130,14 @@ const StudentHome = () => {
                 id: doc.id,
                 ...doc.data()
             }));
+            //layla
+
             setBooks(booksData);
+             const uniqueCategories = ["All", ...new Set(booksData
+                    .map(b => b.category)
+                    .filter(Boolean)
+                )];
+                setCategories(uniqueCategories);
 
             if (auth.currentUser) {
             const userId = auth.currentUser ? auth.currentUser.uid : "user_123";
@@ -152,15 +173,51 @@ const StudentHome = () => {
         fetchBooksAndFavs();}, 400);
     return () => clearTimeout(timeOutId);
 }, [searchTerm]);
-const filteredBooks = books;
+
+
+const filteredBooks = selectedCategory === "All"
+     ? books
+        : books.filter(b => b.category === selectedCategory);
     if (loading) return <div className="loading"><h2>Loading... 📚</h2></div>;
 
     
 
     return (
+        <>
+        {/* Overlay */}
+            {showFilter && (
+                <div className="filter-overlay" onClick={() => setShowFilter(false)} />
+            )}
+
+            {/* Sidebar */}
+            <div className={`filter-sidebar ${showFilter ? "open" : ""}`}>
+                <h3>📂 Categories</h3>
+                <input
+                    type="text"
+                    placeholder="Search category..."
+                    value={categorySearch}
+                    onChange={(e) => setCategorySearch(e.target.value)}
+                    className="category-search"
+                />
+
+                {categories
+                    .filter(cat => cat.toLowerCase().includes(categorySearch.toLowerCase()))
+                    .map(cat => (
+                        <button
+                            key={cat}
+                            className={`category-btn ${selectedCategory === cat ? "active" : ""}`}
+                            onClick={() => { setSelectedCategory(cat); setShowFilter(false); }}
+                        >
+                            {cat}
+                        </button>
+                    ))}
+            </div>
+            
+
         <div className="home-container">
             <h1 className="home-title">Available Books 📚</h1>
             
+            <div className="search-filter-wrapper">
             <div className="search-bar">
                 <FaSearch className="search-icon" />
                 <input 
@@ -169,12 +226,24 @@ const filteredBooks = books;
                     value={searchTerm}
                     onChange={(e) => setSearchTerm(e.target.value)}
                 />
+                 <FaFilter
+                            className="filter-icon"
+                            onClick={() => setShowFilter(!showFilter)}
+                        />
+                    </div>
             </div>
             
             <div className="books-grid">
                 {filteredBooks.map((book) => (
-                    <div key={book.id} className="book-card">
-                        <div className="favorite-icon" onClick={() => handleToggleFavorite(book)}>
+                    <div 
+                        key={book.id} 
+                        className="book-card"
+                        onClick={() => navigate("/book-details", { state: book })}
+                        >
+                        <div className="favorite-icon" onClick={(e) => {
+                            e.stopPropagation();
+                            handleToggleFavorite(book);
+                            }}>
                             <FaHeart className={favBooks.includes(String(book.id)) ? "heart-filled" : "heart-empty"} />
                         </div>
                         <img src={book.image || "https://via.placeholder.com/150"} alt={book.title} className="book-image" />
@@ -191,7 +260,10 @@ const filteredBooks = books;
                                             : ""
                                     }`}
                                 disabled={book.isBorrowed || requestedBooks.includes(book.id)}
-                                onClick={() => handleRequest(book)}
+                               onClick={(e) => {
+                                    e.stopPropagation();
+                                    handleRequest(book);
+                                    }}
                             >
                                 {book.isBorrowed
                                     ? "Borrowed"
@@ -204,6 +276,7 @@ const filteredBooks = books;
                 ))}
             </div>
         </div>
+        </>
     );
 };
 
