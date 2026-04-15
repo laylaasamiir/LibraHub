@@ -1,6 +1,6 @@
 import React from 'react'
 import { StuCard } from '../components/Stucard'
-import { StuTable } from '../components/StuTable'
+import  StuTable  from '../components/StuTable'
 import { signOut } from "firebase/auth";
 import { auth } from "../firebase";
 import { useNavigate } from "react-router-dom";
