@@ -94,127 +94,92 @@ const Borrow = () => {
 
     const handleBorrow = async (e) => {
         e.preventDefault();
-
         try {
             const booksRef = collection(db, "books");
-            const q = query(
-                booksRef,
-                where("bookId", "==", Number(borrowData.bookCode))
-            );
+            const q = query(booksRef, where("bookId", "==", Number(borrowData.bookCode)));
             const querySnapshot = await getDocs(q);
+    
             if (querySnapshot.empty) {
-                setMessage("No book found with the provided code.");
-                setColor("red");
+                setMessage("This book does not exist ");
                 return;
             }
-
-
+    
             const bookDoc = querySnapshot.docs[0];
             const bookData = bookDoc.data();
-            if (bookData.isBorrowed === true) {
-                setMessage("This book is already borrowed.");
-                setColor("#ffc107");
+    
+            if (bookData.isBorrowed) {
+                setMessage(" This book is currently borrowed");
                 return;
             }
-
-
+    
+            
             await addDoc(collection(db, "borrowedBooks"), {
                 studentName: borrowData.studentName,
                 studentCode: borrowData.studentCode,
-                userId: auth.currentUser.uid,
+                userId: auth.currentUser.uid, 
                 bookCode: Number(borrowData.bookCode),
-                bookDocId: bookDoc.id,
+                bookDocId: bookDoc.id, 
                 bookTitle: bookData.title,
-                borrowedAt: serverTimestamp(),
-                status: "borrowed",
+                borrowedAt: serverTimestamp(),  
+                status: "borrowed",           
+                returnedAt: null               
             });
-
-
+    
+          
             await updateDoc(doc(db, "books", bookDoc.id), {
                 isBorrowed: true,
                 borrowedByCode: borrowData.studentCode,
             });
-
-            setMessage("Book borrowed successfully!");
-            setColor("green");
-
-            setBorrowData({
-                studentName: "",
-                studentCode: "",
-                bookCode: "",
-            });
-        } catch (error) {
-            console.error("Error borrowing book:", error);
-            alert("Failed to borrow book.");
-        }
+    
+            setMessage(" Borrowed successfully");
+            setBorrowData({ studentName: "", studentCode: "", bookCode: "" });
+        } catch (e) { console.error(e); }
     };
     const handleReturn = async () => {
         try {
-
-
             const booksRef = collection(db, "books");
-            const q = query(
-                booksRef,
-                where("bookId", "==", Number(borrowData.bookCode))
-            );
-
-            const querySnapshot = await getDocs(q);
-
-            if (querySnapshot.empty) {
-                setMessage(" Book not found.");
-                setColor("red");
+            const qBook = query(booksRef, where("bookId", "==", Number(borrowData.bookCode)));
+            const bookSnap = await getDocs(qBook);
+    
+            if (bookSnap.empty) {
+                setMessage("This book does not exist");
                 return;
             }
-
-            const bookDoc = querySnapshot.docs[0];
-            const bookData = bookDoc.data();
-
-
-            if (!bookData.isBorrowed) {
-                setMessage(" This book is not borrowed.");
-                setColor("#ffc107");
-                return;
-            }
-
-
-            await updateDoc(doc(db, "books", bookDoc.id), {
-                isBorrowed: false,
-                borrowedByCode: ""
-            });
-
-
-            const borrowRef = collection(db, "borrowedBooks");
+    
+            const bookDoc = bookSnap.docs[0];
+    
+           
             const borrowQuery = query(
-                borrowRef,
+                collection(db, "borrowedBooks"),
                 where("bookDocId", "==", bookDoc.id),
-                where("status", "==", "borrowed")
+                where("status", "==", "borrowed"),
+                where("studentCode", "==", borrowData.studentCode) 
             );
-
+            
             const borrowSnapshot = await getDocs(borrowQuery);
-
+            
             if (!borrowSnapshot.empty) {
-                const borrowDoc = borrowSnapshot.docs[0];
-
-                await updateDoc(doc(db, "borrowedBooks", borrowDoc.id), {
+                const activeDoc = borrowSnapshot.docs[0];
+              
+                await updateDoc(doc(db, "borrowedBooks", activeDoc.id), {
                     status: "returned",
-                    returnedAt: serverTimestamp()
+                    returnedAt: serverTimestamp() 
                 });
+    
+              
+                await updateDoc(doc(db, "books", bookDoc.id), {
+                    isBorrowed: false,
+                    borrowedByCode: ""
+                });
+    
+                setMessage(" Returned successfully");
+            } else {
+                setMessage(" Returned successful");
             }
-
-            setMessage("Book returned successfully!");
-            setColor("green");
-
-            setBorrowData({
-                studentName: "",
-                studentCode: "",
-                bookCode: ""
-            });
+            setBorrowData({ studentName: "", studentCode: "", bookCode: "" });
+        } catch (e) { console.error(e); }
+    };         
          
-        } catch (error) {
-            console.error(error);
-            alert(" Failed to return book.");
-        }
-    };
 
 
 

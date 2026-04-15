@@ -1,33 +1,42 @@
 import React, { useEffect, useState } from "react";
-import { collection, doc, getDocs, updateDoc } from "firebase/firestore";
+import { collection, doc, updateDoc, onSnapshot } from "firebase/firestore";
 import { db } from "../firebase";
 import "./addBook.css";
 
 const ConfirmTable = () => {
   const [borrowedBooks, setBorrowedBooks] = useState([]);
+
   
-  const fetchBorrowedBooks = async () => {
-    const querySnapshot = await getDocs(collection(db, "borrowedBooks")); 
-    const borrowedBooksList = querySnapshot.docs.map((doc) => ({
-      id: doc.id,
-      ...doc.data()
-    }));
-    setBorrowedBooks(borrowedBooksList);
-  };
-
   useEffect(() => {
-    fetchBorrowedBooks();
-  }, []);
+    const unsub = onSnapshot(collection(db, "borrowedBooks"), (snapshot) => {
+      const borrowedBooksList = snapshot.docs.map((doc) => ({
+        id: doc.id,
+        ...doc.data(),
+      }));
 
-  const handleReturn =async(id ) =>{
-    await updateDoc(doc(db,"borrowedBooks",id), {
-      returnAt: new Date(),
-     
+      setBorrowedBooks(borrowedBooksList);
     });
 
-    fetchBorrowedBooks();
+    return () => unsub();
+  }, []);
 
+   
+  const handleReturn = async (book) => {
+    await updateDoc(doc(db, "borrowedBooks", book.id), {
+      returnAt: new Date(),
+      isBorrowed: false,  
+    });
+<<<<<<< Updated upstream
+
+    fetchBorrowedBooks();
+=======
+>>>>>>> Stashed changes
+
+    await updateDoc(doc(db, "books" ,book.bookId),{
+      isBorrowed :false,});
+   
   };
+<<<<<<< Updated upstream
           const calculateFine = (borrowedAt, returnAt) => {
     if (!borrowedAt) return { dueDate: "N/A", fine: 0 };
     const borrowDate = borrowedAt.toDate();
@@ -45,12 +54,12 @@ const ConfirmTable = () => {
   };
   
 
+=======
+>>>>>>> Stashed changes
   return (
     <div className="add-book-container">
       <div className="form-card">
         <h2>Confirm Table</h2>
-
-      
         <table className="books-table">
           <thead>
             <tr>
@@ -65,6 +74,7 @@ const ConfirmTable = () => {
           </thead>
 
           <tbody>
+<<<<<<< Updated upstream
            {borrowedBooks.map((book, index) => {
               const { dueDate, fine } = calculateFine(book.borrowedAt, book.returnAt);
            return (
@@ -74,30 +84,58 @@ const ConfirmTable = () => {
  
                 <td>{book.borrowedAt ? book.borrowedAt.toDate().toLocaleString(): "loading..."}</td>
                 <td>{dueDate}</td>
+=======
+            {borrowedBooks.map((book) => (
+              <tr key={book.id}>
+                <td>{book.studentName}</td>
+                <td>{book.bookTitle}</td>
+
+               
+>>>>>>> Stashed changes
                 <td>
-                    {book.returnAt ? (book.returnAt.toDate? book.returnAt.toDate().toLocaleString(): book.returnAt.toLocaleString()) : "Still Borrowed"}
+                  {book.borrowedAt
+                    ? book.borrowedAt.toDate().toLocaleString()
+                    : "-"}
                 </td>
                 <td style={{ color: fine > 0 ? "red" : "black", fontWeight: fine > 0 ? "bold" : "normal" }}>
                   {fine} EGP
                 </td>
 
-                 <td
-                       style={{
-                        color: book.returnAt ? "green" : "red",
-                         fontWeight: "bold"
-                              }}  >
-                         {book.returnAt ?( "Returned") : (
-                          <>
-                          Borrowed
-                          <br />
-                          <button onClick={()=> handleReturn(book.id)}>
-                            Return
-                          </button>
+                
+                <td>
+                  {book.returnAt
+                    ? book.returnAt.toDate().toLocaleString()
+                    : "Still Borrowed"}
+                </td>
 
+<<<<<<< Updated upstream
                             </>)}
                    </td>
                   </tr>
             );})}
+=======
+                
+                <td
+                  style={{
+                    color: book.isBorrowed === false ? "green" : "red",
+                    fontWeight: "bold",
+                  }}
+                >
+                  {book.isBorrowed === false ? (
+                    "Returned"
+                  ) : (
+                    <>
+                      Borrowed
+                      <br />
+                      <button onClick={() => handleReturn(book)}>
+                        Return
+                      </button>
+                    </>
+                  )}
+                </td>
+              </tr>
+            ))}
+>>>>>>> Stashed changes
           </tbody>
         </table>
       </div>
