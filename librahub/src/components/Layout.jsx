@@ -1,6 +1,6 @@
-import { Link, Outlet, useNavigate } from "react-router-dom";
+import { Link,Outlet,useNavigate } from "react-router-dom";
 import "./Layout.css";
-import { FaUserCircle, FaHeart, FaHome, FaSignOutAlt } from "react-icons/fa";
+import { FaUserCircle,FaHeart,FaHome,FaSignOutAlt } from "react-icons/fa";
 import ReviewsSidebar from "../Pages/Reviews";
 
 
@@ -9,11 +9,11 @@ const Layout = () => {
 
     return (
         <>
-
-
-            <Outlet />
+       
+      
+           <Outlet/>
             <nav className="bottom-nav">
-                <Link to="/home" state={{ resetCategory: true }} className="nav-item">
+                <Link to="/home" className="nav-item">
                     <FaHome size={24} />
                     <span>Home</span>
                 </Link>
@@ -26,7 +26,7 @@ const Layout = () => {
                     <span>Exit</span>
                 </div>
             </nav>
-            <ReviewsSidebar />
+          <ReviewsSidebar/>
         </>
     );
 };

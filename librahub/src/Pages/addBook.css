@@ -12,9 +12,8 @@
     padding: 30px;
     border-radius: 12px;
     box-shadow: 0 4px 15px rgba(0,0,0,0.1);
-    width: 95%;
-    max-width: 1200px;
-    overflow-x: auto;
+    width: 100%;
+    max-width: 450px;
 }
 .form-card h2{
     color: #2f68aa;
@@ -77,7 +76,7 @@
 }
 
 .books-table th{
-  background: #f5f5f5; 
+  background:#f4f4f4;
 }
 
 .delete-btn{
