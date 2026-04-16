@@ -4,10 +4,8 @@ import { collection, addDoc, getDocs, query, where, doc, deleteDoc, getDoc, serv
 import { auth, db } from '../firebase';
 import { FaHeart, FaSearch, FaFilter } from 'react-icons/fa';
 import { useLocation } from "react-router-dom";
-import { useNavigate } from "react-router-dom";
 
 const StudentHome = () => {
-    const navigate = useNavigate();
     const [books, setBooks] = useState([]);
     const [loading, setLoading] = useState(true);
     const [favBooks, setFavBooks] = useState([]);
@@ -105,13 +103,7 @@ const StudentHome = () => {
     }
 
     useEffect(() => {
-        if (location.state?.resetCategory) {
-            setSelectedCategory("All");
-        }
-    }, [location]);
-
- useEffect(() => {
-    const fetchBooksAndFavs = async () => {
+        const fetchBooksAndFavs = async () => {
 
         try {
             let q;
@@ -125,58 +117,15 @@ const StudentHome = () => {
             } else {
                 q = collection(db, "books");
             }
-            const booksSnapshot = await getDocs(q);
-            const booksData = booksSnapshot.docs.map(doc => ({
-                id: doc.id,
-                ...doc.data()
-            }));
-            //layla
+        };
+        const timeOutId = setTimeout(() => {
+            fetchBooksAndFavs();
+        }, 400);
+        return () => clearTimeout(timeOutId);
+    }, [searchTerm]);
 
-            setBooks(booksData);
-             const uniqueCategories = ["All", ...new Set(booksData
-                    .map(b => b.category)
-                    .filter(Boolean)
-                )];
-                setCategories(uniqueCategories);
-
-            if (auth.currentUser) {
-            const userId = auth.currentUser ? auth.currentUser.uid : "user_123";
-            const favQuery = query(collection(db, "favorites"),
-                where("userId", "==", userId)
-            );
-
-            const favSnapshot = await getDocs(favQuery);
-            const favIds = favSnapshot.docs.map(doc => String(doc.data().bookId));
-            setFavBooks(favIds);
-
-            
-            const reqQuery = query(
-                collection(db, "borrowRequests"),
-                where("studentId", "==", userId),
-                where("status", "==", "pending")
-            );
-
-            const reqSnapshot = await getDocs(reqQuery);
-
-            const reqIds = reqSnapshot.docs.map(doc => doc.data().bookId);
-
-            setRequestedBooks(reqIds);
-        }
-            setLoading(false);
-
-        } catch (error) {
-            console.error(error);
-            setLoading(false);
-        }
-    };
-    const timeOutId = setTimeout(() => {
-        fetchBooksAndFavs();}, 400);
-    return () => clearTimeout(timeOutId);
-}, [searchTerm]);
-
-
-const filteredBooks = selectedCategory === "All"
-     ? books
+    const filteredBooks = selectedCategory === "All"
+        ? books
         : books.filter(b => b.category === selectedCategory);
     if (loading) return <div className="loading"><h2>Loading... 📚</h2></div>;
 
@@ -212,21 +161,20 @@ const filteredBooks = selectedCategory === "All"
                         </button>
                     ))}
             </div>
-            
 
-        <div className="home-container">
-            <h1 className="home-title">Available Books 📚</h1>
-            
-            <div className="search-filter-wrapper">
-            <div className="search-bar">
-                <FaSearch className="search-icon" />
-                <input 
-                    type="text" 
-                    placeholder="Search ..." 
-                    value={searchTerm}
-                    onChange={(e) => setSearchTerm(e.target.value)}
-                />
-                 <FaFilter
+            <div className="home-container">
+                <h1 className="home-title">Available Books 📚</h1>
+
+                <div className="search-filter-wrapper">
+                    <div className="search-bar">
+                        <FaSearch className="search-icon" />
+                        <input
+                            type="text"
+                            placeholder="Search ..."
+                            value={searchTerm}
+                            onChange={(e) => setSearchTerm(e.target.value)}
+                        />
+                        <FaFilter
                             className="filter-icon"
                             onClick={() => setShowFilter(!showFilter)}
                         />
