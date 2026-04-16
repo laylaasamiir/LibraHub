@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { signInWithEmailAndPassword } from "firebase/auth";
+<<<<<<< HEAD
 import { FacebookAuthProvider, signInWithPopup } from "firebase/auth";
 import { GoogleAuthProvider } from "firebase/auth";
 import { auth } from "../firebase";
@@ -10,12 +11,20 @@ import { Link } from "react-router-dom";
 import { FaFacebook } from "react-icons/fa";
 import { FcGoogle } from "react-icons/fc";
 
+=======
+import { auth } from "../firebase";
+import { useNavigate } from "react-router-dom";
+import { doc, getDoc } from "firebase/firestore";
+import { db } from "../firebase"; 
+import { Link } from "react-router-dom";
+>>>>>>> parent of 5b9a1d1 (Update Login.jsx)
 import './login.css';
 
 const Login = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const navigate = useNavigate();
+<<<<<<< HEAD
   const saveUserIfNew = async (user) => {
   const userRef = doc(db, "users", user.uid);
   const userSnap = await getDoc(userRef);
@@ -103,14 +112,40 @@ const Login = () => {
       alert(error.message);
     }
   };
+=======
+
+const handleLogin = async (e) => {
+  e.preventDefault(); 
+
+  try {
+    const userCredential = await signInWithEmailAndPassword(auth, email, password);
+    const user = userCredential.user;
+
+    const docRef = doc(db, "users", user.uid);
+    const docSnap = await getDoc(docRef);
+
+    if (docSnap.exists()) {
+      const userData = docSnap.data();
+      if (userData.role === "admin") navigate("/Admin");
+      else navigate("/StudentProfile");
+    } else {
+      alert("No user data found.");
+    }
+
+  } catch (error) {
+    alert(error.message);
+  }
+};
+>>>>>>> parent of 5b9a1d1 (Update Login.jsx)
   return (
     <div className="login-page">
       <main className="login-main">
         <div className="login-container">
-          <img src="/book.jpg" alt="Graduation Cap" className="login-icon" />
+          <img src="/book.jpg" alt="Graduation Cap" className="login-icon"/>
           <h1 className="login-title">Login</h1>
           <form className="login-form" onSubmit={handleLogin}>
             <label htmlFor="CollegeEmail" className="login-label">Email</label>
+<<<<<<< HEAD
             <input type="email" value={email} onChange={(e) => setEmail(e.target.value)} placeholder="Enter your email" required className="login-input" />
 
             <label htmlFor="password" className="login-label">Password</label>
@@ -130,6 +165,14 @@ const Login = () => {
 
             </div>
 
+=======
+            <input type="email" value={email} onChange={(e) => setEmail(e.target.value)} placeholder="Enter your email" required className="login-input"/>
+
+            <label htmlFor="password" className="login-label">Password</label>
+            <input type="password" value={password} onChange={(e) => setPassword(e.target.value)} placeholder="Enter your password" required className="login-input"/>
+
+            <button type="submit" className="login-button">Login</button>
+>>>>>>> parent of 5b9a1d1 (Update Login.jsx)
           </form>
           <p className="login-footer">Don't have an account? <Link to="/Register" className="login-link">Register</Link></p>
         </div>
