@@ -9,7 +9,7 @@ export const AdminSidebar = () => {
         <h1>Admin Panel</h1>
         <Link to={"/Borrow"}>Borrow & Return</Link>
         <Link to={"/add-and-remove"}>Admins</Link>
-        <Link to={"/AddBook"}>Add New Books</Link>
+        <Link to={"/AdminAddBook"}>Add New Books</Link>
         <Link to={"/AdminRegister"}>Add New Admin</Link>
          <Link to={"/books"}>Book Management</Link>
          <Link to="/confirm-table">History</Link>
