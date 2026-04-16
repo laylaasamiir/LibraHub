@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { collection, doc, updateDoc, onSnapshot } from "firebase/firestore";
+import { collection, doc, getDocs, updateDoc } from "firebase/firestore";
 import { db } from "../firebase";
 import "./addBook.css";
 
@@ -27,32 +27,18 @@ const ConfirmTable = () => {
     setBorrowedBooks(borrowedBooksList);
   };
 
-  
   useEffect(() => {
-    const unsub = onSnapshot(collection(db, "borrowedBooks"), (snapshot) => {
-      const borrowedBooksList = snapshot.docs.map((doc) => ({
-        id: doc.id,
-        ...doc.data(),
-      }));
-
-      setBorrowedBooks(borrowedBooksList);
-    });
-
-    return () => unsub();
+    fetchBorrowedBooks();
   }, []);
 
-   
-  const handleReturn = async (book) => {
-    await updateDoc(doc(db, "borrowedBooks", book.id), {
+  const handleReturn =async(id ) =>{
+    await updateDoc(doc(db,"borrowedBooks",id), {
       returnAt: new Date(),
-      isBorrowed: false,  
+     
     });
 
     fetchBorrowedBooks();
 
-    await updateDoc(doc(db, "books" ,book.bookId),{
-      isBorrowed :false,});
-   
   };
           const calculateFine = (borrowedAt, returnAt) => {
     if (!borrowedAt) return { dueDate: "N/A", fine: 0 };
@@ -118,53 +104,30 @@ const ConfirmTable = () => {
  
                 <td>{book.borrowedAt ? book.borrowedAt.toDate().toLocaleString(): "loading..."}</td>
                 <td>{dueDate}</td>
-            {borrowedBooks.map((book) => (
-              <tr key={book.id}>
-                <td>{book.studentName}</td>
-                <td>{book.bookTitle}</td>
-
-               
                 <td>
-                  {book.borrowedAt
-                    ? book.borrowedAt.toDate().toLocaleString()
-                    : "-"}
+                    {book.returnAt ? (book.returnAt.toDate? book.returnAt.toDate().toLocaleString(): book.returnAt.toLocaleString()) : "Still Borrowed"}
                 </td>
                 <td style={{ color: fine > 0 ? "red" : "black", fontWeight: fine > 0 ? "bold" : "normal" }}>
                   {fine} EGP
                 </td>
 
-                
-                <td>
-                  {book.returnAt
-                    ? book.returnAt.toDate().toLocaleString()
-                    : "Still Borrowed"}
-                </td>
+                 <td
+                       style={{
+                        color: book.returnAt ? "green" : "red",
+                         fontWeight: "bold"
+                              }}  >
+                         {book.returnAt ?( "Returned") : (
+                          <>
+                          Borrowed
+                          <br />
+                          <button onClick={()=> handleReturn(book.id)}>
+                            Return
+                          </button>
 
                             </>)}
                    </td>
                   </tr>
             );})}
-                
-                <td
-                  style={{
-                    color: book.isBorrowed === false ? "green" : "red",
-                    fontWeight: "bold",
-                  }}
-                >
-                  {book.isBorrowed === false ? (
-                    "Returned"
-                  ) : (
-                    <>
-                      Borrowed
-                      <br />
-                      <button onClick={() => handleReturn(book)}>
-                        Return
-                      </button>
-                    </>
-                  )}
-                </td>
-              </tr>
-            ))}
           </tbody>
         </table>
       </div>
