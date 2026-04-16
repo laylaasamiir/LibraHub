@@ -117,3 +117,13 @@
     filter: brightness(0.9);
 }
 
+.status-badge.borrowed {
+  color: orange;
+  font-weight: bold;
+}
+
+
+.status-badge.returned {
+  color: green;
+  font-weight: bold;
+}
