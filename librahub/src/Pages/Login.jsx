@@ -58,7 +58,7 @@ const Login = () => {
       if (!data.department || !data.level) {
         navigate("/complete-profile");
       } else {
-        navigate("/StudentProfile");
+        navigate("/home");
       }
 
       console.log(result.user);
@@ -74,7 +74,7 @@ const Login = () => {
       if (!data.department || !data.level) {
         navigate("/complete-profile");
       } else {
-        navigate("/StudentProfile");
+        navigate("/home");
       }
       console.log(res.user);
     } catch (e) {
@@ -94,7 +94,7 @@ const Login = () => {
       if (docSnap.exists()) {
         const userData = docSnap.data();
         if (userData.role === "admin") navigate("/Borrow");
-        else navigate("/StudentProfile");
+        else navigate("/home");
       } else {
         alert("No user data found.");
       }
