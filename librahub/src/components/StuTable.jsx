@@ -1,52 +1,53 @@
-import React, { useEffect, useState } from "react";
-import "../Pages/StudentProfile.css";
-import { collection, query, where, onSnapshot, orderBy } from "firebase/firestore";
+import React from 'react'
+import '../Pages/StudentProfile.css'
+import { useState, useEffect } from "react";
+import { collection, getDocs, query, where } from "firebase/firestore"; 
 import { auth, db } from "../firebase";
-import { onAuthStateChanged } from "firebase/auth";
+import { onAuthStateChanged } from "firebase/auth";  
 
-const StuTable = () => {
+export const StuTable = () => {
   const [books, setBooks] = useState([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-     
-    const unsubscribeAuth = onAuthStateChanged(auth, (user) => {
-      if (!user) {
+
+    const unsubscribe = onAuthStateChanged(auth, async (user) => {
+      if (user) {
+        try {
+          const q = query(
+            collection(db, "borrowedBooks"),
+            where("userId", "==", user.uid)  
+          );
+
+          const querySnapshot = await getDocs(q);
+
+          const data = querySnapshot.docs.map(doc => ({
+            id: doc.id,
+            ...doc.data()
+          }));
+
+          setBooks(data);
+
+        } catch (error) {
+          console.error("Error fetching books:", error);
+        } finally {
+          setLoading(false);
+        }
+
+      } else {
         setBooks([]);
         setLoading(false);
-        return;
       }
- 
-      const q = query(
-        collection(db, "borrowedBooks"),
-        where("userId", "==", user.uid),
-        orderBy("borrowedAt", "desc")
-      );
-
-      const unsubscribeSnap = onSnapshot(q, (snapshot) => {
-        const data = snapshot.docs.map((doc) => ({
-          id: doc.id,
-          ...doc.data(),
-        }));
-
-        setBooks(data);
-        setLoading(false);
-      }, (error) => {
-        console.error("Firebase Error: ", error);
-        setLoading(false);
-      });
-
-      return () => unsubscribeSnap();
     });
 
-    return () => unsubscribeAuth();
+    return () => unsubscribe();
   }, []);
 
-  if (loading) return <p style={{ textAlign: "center", padding: "20px" }} >Loading borrowing history...</p>;
+  if (loading) return <p>Loading...</p>;
 
   return (
-    <div className="table-container" style={{ padding: "20px" }}>
-      <table className="stu-table">
+    <div className="pc-card">
+      <table className="loans-table">
         <thead>
           <tr>
             <th>#</th>
@@ -56,47 +57,36 @@ const StuTable = () => {
             <th>Status</th>
           </tr>
         </thead>
-        
+
         <tbody>
-          {books.length > 0 ? (
-            books.map((item, index) => (
-              <tr key={item.id}>
+          {books.length === 0 ? (
+            <tr>
+              <td colSpan="5">No books borrowed yet</td>
+            </tr>
+          ) : (
+            books.map((book, index) => (
+              <tr key={book.id}>
                 <td>{index + 1}</td>
-                <td>{item.bookTitle}</td>
-                
-                 
+                <td>{book.bookTitle}</td>
+
                 <td>
-                  {item.borrowedAt?.toDate 
-                    ? item.borrowedAt.toDate().toLocaleString() 
-                    : "wating.."}
+                  {book.borrowedAt?.seconds
+                    ? new Date(book.borrowedAt.seconds * 1000).toLocaleString()
+                    : "-"}
                 </td>
-                
-                
+
                 <td>
-                  {item.status === "returned" 
-                    ? (item.returnedAt?.toDate ? item.returnedAt.toDate().toLocaleString() : "Returned") 
-                    : <span style={{ color: 'orange', fontWeight: 'bold' }}>Borrowed</span>}
+                  {book.returnedAt?.seconds
+                    ? new Date(book.returnedAt.seconds * 1000).toLocaleString()
+                    : "Not returned"}
                 </td>
-                
-                
-                <td>
-                  <span className={`status-badge ${item.status}`}>
-                    {item.status === "returned" ? "returned" : "borrowed"}
-                  </span>
-                </td>
+
+                <td>{book.status}</td>
               </tr>
             ))
-          ) : (
-            <tr>
-              <td colSpan="5" style={{ textAlign: 'center', padding: "20px" }}>
-                No borrowing history 
-              </td>
-            </tr>
           )}
         </tbody>
       </table>
     </div>
   );
-};
-
-export default StuTable;
+}

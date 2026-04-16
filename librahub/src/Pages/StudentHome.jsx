@@ -83,7 +83,7 @@ const StudentHome = () => {
 
 
             await addDoc(collection(db, "borrowRequests"), {
-                studentId: auth.currentUser.uid,
+                studentId: user.uid,
                 studentName: studentData.fullName || "",
                 studentEmail: studentData.email || user.email || "",
                 bookId: book.id,
