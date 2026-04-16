@@ -12,10 +12,7 @@ import {
 } from "firebase/firestore";
 import { FaUser, FaLock } from "react-icons/fa";
 import { auth, db } from "../firebase";
-import AdminRequests from '../components/AdminRequest';
- 
-
- 
+import AdminRequests from "../components/AdminRequest";
 
 const Borrow = () => {
   const [borrowData, setBorrowData] = useState({
@@ -63,6 +60,7 @@ const Borrow = () => {
       await addDoc(collection(db, "borrowedBooks"), {
         studentName: borrowData.studentName,
         studentCode: borrowData.studentCode,
+        userId: auth.currentUser.uid,
         bookCode: Number(borrowData.bookCode),
         bookDocId: bookDoc.id,
         bookTitle: bookData.title,
@@ -258,7 +256,6 @@ const Borrow = () => {
           </div>
 
           <label>Enter Book Copy ID:</label>
-
           <div className="input-box">
             <FaLock className="icon" />
             <input
@@ -269,6 +266,8 @@ const Borrow = () => {
               onChange={handleChange}
             />
           </div>
+
+          <br />
 
           <div className="buttons">
             <button className="confirm" onClick={handleBorrow}>
@@ -282,7 +281,7 @@ const Borrow = () => {
       </div>
 
       <AdminRequests />
-    </div>
+    </>
   );
 };
 
