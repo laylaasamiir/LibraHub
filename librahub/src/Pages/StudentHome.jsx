@@ -4,10 +4,8 @@ import { collection, addDoc, getDocs, query, where, doc, deleteDoc, getDoc, serv
 import { auth, db } from '../firebase';
 import { FaHeart, FaSearch, FaFilter } from 'react-icons/fa';
 import { useLocation } from "react-router-dom";
-import { useNavigate } from "react-router-dom";
 
 const StudentHome = () => {
-    const navigate = useNavigate();
     const [books, setBooks] = useState([]);
     const [loading, setLoading] = useState(true);
     const [favBooks, setFavBooks] = useState([]);
@@ -110,13 +108,7 @@ const StudentHome = () => {
     }, [location]);
 
     useEffect(() => {
-        if (location.state?.resetCategory) {
-            setSelectedCategory("All");
-        }
-    }, [location]);
-
- useEffect(() => {
-    const fetchBooksAndFavs = async () => {
+        const fetchBooksAndFavs = async () => {
 
             try {
                 let q;
@@ -173,65 +165,22 @@ const StudentHome = () => {
                 console.error(error);
                 setLoading(false);
             }
-            const booksSnapshot = await getDocs(q);
-            const booksData = booksSnapshot.docs.map(doc => ({
-                id: doc.id,
-                ...doc.data()
-            }));
-            //layla
+        };
+        const timeOutId = setTimeout(() => {
+            fetchBooksAndFavs();
+        }, 400);
+        return () => clearTimeout(timeOutId);
+    }, [searchTerm]);
 
-            setBooks(booksData);
-             const uniqueCategories = ["All", ...new Set(booksData
-                    .map(b => b.category)
-                    .filter(Boolean)
-                )];
-                setCategories(uniqueCategories);
-
-            if (auth.currentUser) {
-            const userId = auth.currentUser ? auth.currentUser.uid : "user_123";
-            const favQuery = query(collection(db, "favorites"),
-                where("userId", "==", userId)
-            );
-
-            const favSnapshot = await getDocs(favQuery);
-            const favIds = favSnapshot.docs.map(doc => String(doc.data().bookId));
-            setFavBooks(favIds);
-
-            
-            const reqQuery = query(
-                collection(db, "borrowRequests"),
-                where("studentId", "==", userId),
-                where("status", "==", "pending")
-            );
-
-            const reqSnapshot = await getDocs(reqQuery);
-
-            const reqIds = reqSnapshot.docs.map(doc => doc.data().bookId);
-
-            setRequestedBooks(reqIds);
-        }
-            setLoading(false);
-
-        } catch (error) {
-            console.error(error);
-            setLoading(false);
-        }
-    };
-    const timeOutId = setTimeout(() => {
-        fetchBooksAndFavs();}, 400);
-    return () => clearTimeout(timeOutId);
-}, [searchTerm]);
-
-
-const filteredBooks = selectedCategory === "All"
-     ? books
+    const filteredBooks = selectedCategory === "All"
+        ? books
         : books.filter(b => b.category === selectedCategory);
     if (loading) return <div className="loading"><h2>Loading... 📚</h2></div>;
 
 
     return (
         <>
-        
+         
             {showFilter && (
                 <div className="filter-overlay" onClick={() => setShowFilter(false)} />
             )}
@@ -259,66 +208,23 @@ const filteredBooks = selectedCategory === "All"
                         </button>
                     ))}
             </div>
-            
 
-        <div className="home-container">
-            <h1 className="home-title">Available Books 📚</h1>
-            
-            <div className="search-filter-wrapper">
-            <div className="search-bar">
-                <FaSearch className="search-icon" />
-                <input 
-                    type="text" 
-                    placeholder="Search ..." 
-                    value={searchTerm}
-                    onChange={(e) => setSearchTerm(e.target.value)}
-                />
-                 <FaFilter
+            <div className="home-container">
+                <h1 className="home-title">Available Books 📚</h1>
+
+                <div className="search-filter-wrapper">
+                    <div className="search-bar">
+                        <FaSearch className="search-icon" />
+                        <input
+                            type="text"
+                            placeholder="Search ..."
+                            value={searchTerm}
+                            onChange={(e) => setSearchTerm(e.target.value)}
+                        />
+                        <FaFilter
                             className="filter-icon"
                             onClick={() => setShowFilter(!showFilter)}
                         />
-                    </div>
-            </div>
-            
-            <div className="books-grid">
-                {filteredBooks.map((book) => (
-                    <div 
-                        key={book.id} 
-                        className="book-card"
-                        onClick={() => navigate("/book-details", { state: book })}
-                        >
-                        <div className="favorite-icon" onClick={(e) => {
-                            e.stopPropagation();
-                            handleToggleFavorite(book);
-                            }}>
-                            <FaHeart className={favBooks.includes(String(book.id)) ? "heart-filled" : "heart-empty"} />
-                        </div>
-                        <img src={book.image || "https://via.placeholder.com/150"} alt={book.title} className="book-image" />
-                        <div className="book-info">
-                            <h3>{book.title}</h3>
-                            <p className="author">By: {book.author}</p>
-                            <p className="description">{book.description}</p>
-
-                            <button
-                                className={`request-btn ${book.isBorrowed
-                                        ? "borrowed-btn"
-                                        : requestedBooks.includes(book.id)
-                                            ? "requested-btn"
-                                            : ""
-                                    }`}
-                                disabled={book.isBorrowed || requestedBooks.includes(book.id)}
-                               onClick={(e) => {
-                                    e.stopPropagation();
-                                    handleRequest(book);
-                                    }}
-                            >
-                                {book.isBorrowed
-                                    ? "Borrowed"
-                                    : requestedBooks.includes(book.id)
-                                        ? "Requested"
-                                        : "Request Book"}
-                            </button>
-                        </div>
                     </div>
                 </div>
 
