@@ -5,7 +5,7 @@ import { auth, dp } from '../components/firebase';
 import { doc, setDoc } from "firebase/firestore";
 import { Picker } from "@react-native-picker/picker";
 
-export default function RegisterForm({ onRegisterSuccess, onLoginPress }) {
+export default function RegisterScreen({ onRegisterSuccess, onLoginPress }) {
     const [name, setName] = useState("");
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");

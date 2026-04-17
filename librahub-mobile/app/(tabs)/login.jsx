@@ -1,8 +1,8 @@
 import React, { useState } from "react";
 import { View } from "react-native";
 import LoginScreen from "../../components/LoginScreen";
-import RegisterScreen from "../../components/RegisterScreen";
-import ProfileScreen from "../../components/ProfileScreen"; 
+import ProfileScreen from "../../components/ProfileScreen";
+ import RegisterScreen from "../../components/RegisterScreen";
 
 export default function AppLoginScreen() {
   
