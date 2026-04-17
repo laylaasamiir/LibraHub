@@ -11,7 +11,7 @@ import {
     serverTimestamp
 } from "firebase/firestore";
 import { FaUser, FaLock } from "react-icons/fa";
-import { auth, db } from "../firebase";
+import { db } from "../firebase";
 import AdminRequests from '../components/AdminRequest';
  
 
@@ -64,7 +64,6 @@ const Borrow = () => {
             await addDoc(collection(db, "borrowedBooks"), {
                 studentName: borrowData.studentName,
                 studentCode: borrowData.studentCode,
-                userId: auth.currentUser.uid,
                 bookCode: Number(borrowData.bookCode),
                 bookDocId: bookDoc.id,
                 bookTitle: bookData.title,
@@ -91,67 +90,73 @@ const Borrow = () => {
             alert("Failed to borrow book.");
         }
     };
-  const handleReturn = async () => {
-    try {
-      const booksRef = collection(db, "books");
-      const q = query(
-        booksRef,
-        where("bookId", "==", Number(borrowData.bookCode))
-      );
+    const handleReturn = async () => {
+        try {
 
-      const querySnapshot = await getDocs(q);
 
-      if (querySnapshot.empty) {
-        setMessage("Book not found.");
-        setColor("red");
-        return;
-      }
+            const booksRef = collection(db, "books");
+            const q = query(
+                booksRef,
+                where("bookId", "==", Number(borrowData.bookCode))
+            );
 
-      const bookDoc = querySnapshot.docs[0];
-      const bookData = bookDoc.data();
+            const querySnapshot = await getDocs(q);
 
-      if (!bookData.isBorrowed) {
-        setMessage("This book is not borrowed.");
-        setColor("#ffc107");
-        return;
-      }
+            if (querySnapshot.empty) {
+                setMessage(" Book not found.");
+                setColor("red");
+                return;
+            }
 
-      await updateDoc(doc(db, "books", bookDoc.id), {
-        isBorrowed: false,
-        borrowedByCode: "",
-      });
+            const bookDoc = querySnapshot.docs[0];
+            const bookData = bookDoc.data();
 
-      const borrowRef = collection(db, "borrowedBooks");
-      const borrowQuery = query(
-        borrowRef,
-        where("bookDocId", "==", bookDoc.id),
-        where("status", "==", "borrowed")
-      );
 
-      const borrowSnapshot = await getDocs(borrowQuery);
+            if (!bookData.isBorrowed) {
+                setMessage(" This book is not borrowed.");
+                setColor("#ffc107");
+                return;
+            }
 
-      if (!borrowSnapshot.empty) {
-        const borrowDoc = borrowSnapshot.docs[0];
 
-        await updateDoc(doc(db, "borrowedBooks", borrowDoc.id), {
-          status: "returned",
-          returnedAt: serverTimestamp(),
-        });
-      }
+            await updateDoc(doc(db, "books", bookDoc.id), {
+                isBorrowed: false,
+                borrowedByCode: ""
+            });
 
-      setMessage("Book returned successfully!");
-      setColor("green");
 
-      setBorrowData({
-        studentName: "",
-        studentCode: "",
-        bookCode: "",
-      });
-    } catch (error) {
-      console.error(error);
-      alert("Failed to return book.");
-    }
-  };
+            const borrowRef = collection(db, "borrowedBooks");
+            const borrowQuery = query(
+                borrowRef,
+                where("bookDocId", "==", bookDoc.id),
+                where("status", "==", "borrowed")
+            );
+
+            const borrowSnapshot = await getDocs(borrowQuery);
+
+            if (!borrowSnapshot.empty) {
+                const borrowDoc = borrowSnapshot.docs[0];
+
+                await updateDoc(doc(db, "borrowedBooks", borrowDoc.id), {
+                    status: "returned",
+                    returnedAt: serverTimestamp()
+                });
+            }
+
+            setMessage("Book returned successfully!");
+            setColor("green");
+
+            setBorrowData({
+                studentName: "",
+                studentCode: "",
+                bookCode: ""
+            });
+         
+        } catch (error) {
+            console.error(error);
+            alert(" Failed to return book.");
+        }
+    };
 
 
 
@@ -160,27 +165,27 @@ const Borrow = () => {
  
 
 
-          <div className="borrow-page">
-        <div className="borrow-card">
-          <h2>Borrow Book</h2>
+            <div className="borrow-page">
+                <div className="borrow-card">
+                    <h2>Borrow Book</h2>
+                    {messages && (
+                        <p style={{ color: color, fontWeight: "bold" }}>
+                            {messages}
+                        </p>
+                    )}
+                    <div className="card">
+                        <label> Enter Student: </label>
 
-          {messages && (
-            <p style={{ color: color, fontWeight: "bold" }}>
-              {messages}
-            </p>
-          )}
 
-          <div className="card">
-            <label>Enter Student:</label>
 
-            <div className="input-box">
-              <FaUser className="icon" />
-              <input
-                type="text"
-                placeholder="Enter Student Name..."
-                name="studentName"
-                value={borrowData.studentName}
-                onChange={handleChange}
+                        <div className="input-box">
+                            <FaUser className="icon" />
+                            <input
+                                type="text"
+                                placeholder="Enter Student Name..."
+                                name='studentName'
+                                value={borrowData.studentName}
+                                onChange={handleChange}
                             />
                         </div>
                         <div className="input-box">
