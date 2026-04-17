@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import { db } from "../firebase";
 import { Link } from "react-router-dom";
 import { collection, query, where, onSnapshot, doc, deleteDoc } from "firebase/firestore";
-import './StudentProfile.css';
+import './admin.css';
 
 export const AddAndRemove = () => {
 
@@ -31,8 +31,8 @@ const handleRemove = async (id) => {
 };
 
   return (
-    <div className="table-container">
-      <table className="borrow-table">
+    <div className="showAdmin-container">
+      <table className="showAdmin-table">
         <caption style={{backgroundColor: "#3498db", color: "white", padding: "8px", fontSize: "18px", borderRadius:"6px"}}>
           Admins
         </caption>
@@ -55,7 +55,7 @@ const handleRemove = async (id) => {
           ))}
         </tbody>
       </table>
-      <Link to="/admin/admin-register">
+      <Link to="/AdminRegister">
         <button className="add-admin" title="Add New Admin">+</button>
       </Link>
     </div>

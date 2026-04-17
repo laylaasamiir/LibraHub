@@ -1,39 +1,35 @@
+
 import React, { useEffect, useState, useRef, useCallback } from "react";
 import "./StuCard.css";
 import { auth, db } from "../firebase";
-import { doc, getDoc, updateDoc } from "firebase/firestore";
+import { doc, getDoc, updateDoc, collection, query, where, getDocs } from "firebase/firestore";
 import { onAuthStateChanged } from "firebase/auth";
 import Webcam from "react-webcam";
 
-
-const CLOUDINARY_UPLOAD_PRESET = "Librahub"; 
+const CLOUDINARY_UPLOAD_PRESET = "Librahub";
 
 const uploadToCloudinary = async (file) => {
   const formData = new FormData();
   formData.append("file", file);
   formData.append("upload_preset", CLOUDINARY_UPLOAD_PRESET);
-
-  const res = await fetch(
-    `https://api.cloudinary.com/v1_1/dmqwypcqm/image/upload`,
-    { method: "POST", body: formData }
-  );
+  const res = await fetch(`https://api.cloudinary.com/v1_1/dmqwypcqm/image/upload`, {
+    method: "POST",
+    body: formData,
+  });
   const data = await res.json();
   if (!data.secure_url) throw new Error("Cloudinary upload failed");
   return data.secure_url;
 };
 
 const uploadBase64ToCloudinary = async (base64String) => {
-  const res = await fetch(
-    `https://api.cloudinary.com/v1_1/dmqwypcqm/image/upload`,
-    {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        file: base64String,
-        upload_preset: CLOUDINARY_UPLOAD_PRESET,
-      }),
-    }
-  );
+  const res = await fetch(`https://api.cloudinary.com/v1_1/dmqwypcqm/image/upload`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      file: base64String,
+      upload_preset: CLOUDINARY_UPLOAD_PRESET,
+    }),
+  });
   const data = await res.json();
   if (!data.secure_url) throw new Error("Cloudinary upload failed");
   return data.secure_url;
@@ -46,15 +42,24 @@ export const StuCard = () => {
   const [avatarUrl, setAvatarUrl] = useState(null);
   const [uploading, setUploading] = useState(false);
   const [uploadError, setUploadError] = useState(null);
-
-  
+  const [borrowedCount, setBorrowedCount] = useState(0);
   const [showModal, setShowModal] = useState(false);
-  const [mode, setMode] = useState("choose"); 
+  const [mode, setMode] = useState("choose");
   const [preview, setPreview] = useState(null);
   const [capturedImage, setCapturedImage] = useState(null);
+  const [showEditModal, setShowEditModal] = useState(false);
+  const [editData, setEditData] = useState({
+    name: "",
+    department: "",
+    level: "",
+  });
+  const [editLoading, setEditLoading] = useState(false);
+  const [editError, setEditError] = useState("");
+  const [editSuccess, setEditSuccess] = useState("");
 
   const webcamRef = useRef(null);
   const fileInputRef = useRef(null);
+
 
   useEffect(() => {
     const unsub = onAuthStateChanged(auth, async (user) => {
@@ -70,6 +75,19 @@ export const StuCard = () => {
           const data = snap.data();
           setUserData(data);
           if (data.avatarUrl) setAvatarUrl(data.avatarUrl);
+
+
+        
+          if (data.studentCode) {
+            const borrowRef = collection(db, "borrowedBooks");
+            const q = query(
+              borrowRef,
+              where("studentCode", "==", data.studentCode)
+            );
+            const snapshot = await getDocs(q);
+            setBorrowedCount(snapshot.size); 
+          }
+
         }
       } catch {
         setUserData(null);
@@ -80,7 +98,6 @@ export const StuCard = () => {
     return () => unsub();
   }, []);
 
-  
   const handleCapture = useCallback(() => {
     const imageSrc = webcamRef.current?.getScreenshot();
     if (imageSrc) {
@@ -90,20 +107,18 @@ export const StuCard = () => {
     }
   }, []);
 
-  
   const handleFileChange = (e) => {
     const file = e.target.files[0];
     if (!file) return;
     const reader = new FileReader();
     reader.onload = (ev) => {
       setPreview(ev.target.result);
-      setCapturedImage(null); 
+      setCapturedImage(null);
       setMode("preview");
     };
     reader.readAsDataURL(file);
   };
 
-  
   const handleSaveAvatar = async () => {
     if (!preview || !currentUser) return;
     setUploading(true);
@@ -122,7 +137,7 @@ export const StuCard = () => {
       setMode("choose");
       setPreview(null);
       setCapturedImage(null);
-    } catch (err) {
+    } catch {
       setUploadError("Upload failed, please try again.");
     } finally {
       setUploading(false);
@@ -144,7 +159,45 @@ export const StuCard = () => {
     setCapturedImage(null);
   };
 
-  
+
+  const handleOpenEdit = () => {
+    setEditData({
+      name: userData?.name || "",
+      department: userData?.department || "",
+      level: userData?.level || "",
+      studentCode: userData?.studentCode || "",
+    });
+    setEditError("");
+    setEditSuccess("");
+    setShowEditModal(true);
+  };
+
+ 
+  const handleSaveEdit = async () => {
+    if (!editData.name.trim()) {
+      setEditError("Name cannot be empty.");
+      return;
+    }
+    setEditLoading(true);
+    setEditError("");
+    setEditSuccess("");
+    try {
+      await updateDoc(doc(db, "users", currentUser.uid), {
+        name: editData.name.trim(),
+        department: editData.department.trim(),
+        level: editData.level.trim(),
+        studentCode: editData.studentCode.trim(),
+      });
+      setUserData((prev) => ({ ...prev, ...editData }));
+      setEditSuccess("✅ Profile updated successfully!");
+      setTimeout(() => setShowEditModal(false), 1500);
+    } catch {
+      setEditError("❌ Failed to update. Try again.");
+    } finally {
+      setEditLoading(false);
+    }
+  };
+
   const Skel = ({ w }) => (
     <span className="pc-skeleton" style={{ width: w || "80px" }} />
   );
@@ -159,11 +212,9 @@ export const StuCard = () => {
 
   return (
     <>
-      
       <div className="pc-card">
         <div className="pc-header-band" />
 
-      
         <div className="pc-avatar-wrapper">
           <div className="pc-avatar-ring">
             {avatarUrl ? (
@@ -191,7 +242,6 @@ export const StuCard = () => {
         </h2>
         <span className="pc-role-badge">STUDENT</span>
 
-       
         <div className="pc-stats-row">
           <div className="pc-stat-box">
             <span className="pc-stat-icon">🎓</span>
@@ -204,13 +254,12 @@ export const StuCard = () => {
           <div className="pc-stat-box">
             <span className="pc-stat-icon">📚</span>
             <span className="pc-stat-value">
-              {loading ? <Skel w={24} /> : userData?.borrowedBooks ?? 0}
+              {loading ? <Skel w={24} /> : borrowedCount}
             </span>
             <span className="pc-stat-label">BOOKS BORROWED</span>
           </div>
         </div>
 
-        
         <div className="pc-table">
           {[
             { label: "EMAIL", value: userData?.email },
@@ -228,18 +277,20 @@ export const StuCard = () => {
 
         <div className="pc-actions">
           <button className="pc-btn">Fine Details</button>
-          <button className="pc-btn-outline">Edit Profile</button>
+          {/* ✅ Edit Profile */}
+          <button className="pc-btn-outline" onClick={handleOpenEdit}>
+            Edit Profile
+          </button>
         </div>
       </div>
 
-      
+     
       {showModal && (
         <div className="pc-modal-overlay" onClick={handleCloseModal}>
           <div className="pc-modal" onClick={(e) => e.stopPropagation()}>
             <button className="pc-modal-close" onClick={handleCloseModal}>✕</button>
             <h3 className="pc-modal-title">Change profile picture</h3>
 
-            {/* Step 1 – Choose mode */}
             {mode === "choose" && (
               <div className="pc-modal-choices">
                 <button className="pc-choice-btn" onClick={() => setMode("upload")}>
@@ -251,7 +302,6 @@ export const StuCard = () => {
               </div>
             )}
 
-           
             {mode === "upload" && (
               <div className="pc-modal-body">
                 <input
@@ -262,13 +312,12 @@ export const StuCard = () => {
                   onChange={handleFileChange}
                 />
                 <button className="pc-choice-btn" onClick={() => fileInputRef.current.click()}>
-                 Choose an image from your device
+                  Choose an image from your device
                 </button>
                 <button className="pc-back-btn" onClick={() => setMode("choose")}>Back ←</button>
               </div>
             )}
 
-            
             {mode === "camera" && (
               <div className="pc-modal-body">
                 <Webcam
@@ -277,30 +326,25 @@ export const StuCard = () => {
                   className="pc-webcam"
                   mirrored
                 />
-                <button className="pc-choice-btn" onClick={handleCapture}>📸 التقط</button>
-                <button className="pc-back-btn" onClick={() => setMode("choose")}>← رجوع</button>
+                <button className="pc-choice-btn" onClick={handleCapture}>📸 Capture</button>
+                <button className="pc-back-btn" onClick={() => setMode("choose")}>← Back</button>
               </div>
             )}
 
-            
             {mode === "preview" && preview && (
               <div className="pc-modal-body">
                 <img src={preview} alt="preview" className="pc-preview-img" />
                 {uploadError && <p className="pc-error">{uploadError}</p>}
                 <div className="pc-modal-actions">
-                  <button
-                    className="pc-btn"
-                    onClick={handleSaveAvatar}
-                    disabled={uploading}
-                  >
-                    {uploading ? "Uploading in progress..." : " Save image ✅"}
+                  <button className="pc-btn" onClick={handleSaveAvatar} disabled={uploading}>
+                    {uploading ? "Uploading..." : "Save image ✅"}
                   </button>
                   <button className="pc-btn-outline" onClick={() => {
                     setPreview(null);
                     setCapturedImage(null);
                     setMode("choose");
                   }}>
-                    cancel
+                    Cancel
                   </button>
                 </div>
               </div>
@@ -308,6 +352,74 @@ export const StuCard = () => {
           </div>
         </div>
       )}
+
+
+      {showEditModal && (
+        <div className="pc-modal-overlay" onClick={() => setShowEditModal(false)}>
+          <div className="pc-modal" onClick={(e) => e.stopPropagation()}>
+            <button className="pc-modal-close" onClick={() => setShowEditModal(false)}>✕</button>
+            <h3 className="pc-modal-title">Edit Profile</h3>
+
+            <div className="pc-edit-form">
+              <div className="pc-edit-field">
+                <label>Name</label>
+                <input
+                  type="text"
+                  value={editData.name}
+                  onChange={(e) => setEditData({ ...editData, name: e.target.value })}
+                  placeholder="Enter your name"
+                />
+              </div>
+
+              <div className="pc-edit-field">
+                <label>Department</label>
+                <input
+                  type="text"
+                  value={editData.department}
+                  onChange={(e) => setEditData({ ...editData, department: e.target.value })}
+                  placeholder="Enter your department"
+                />
+              </div>
+              <div className="pc-edit-field">
+                <label>Student Code</label>
+                <input
+                  type="text"
+                  value={editData.studentCode}
+                  onChange={(e) => setEditData({ ...editData, studentCode: e.target.value })}
+                  placeholder="Enter your student code"
+                />
+              </div>
+
+              <div className="pc-edit-field">
+                <label>Level</label>
+                <select
+                  value={editData.level}
+                  onChange={(e) => setEditData({ ...editData, level: e.target.value })}
+                >
+                  <option value="">Select Level</option>
+                  <option value="Level 1">Level 1</option>
+                  <option value="Level 2">Level 2</option>
+                  <option value="Level 3">Level 3</option>
+                  <option value="Level 4">Level 4</option>
+                </select>
+              </div>
+
+              {editError && <p className="pc-error">{editError}</p>}
+              {editSuccess && <p className="pc-success">{editSuccess}</p>}
+
+              <div className="pc-modal-actions">
+                <button className="pc-btn" onClick={handleSaveEdit} disabled={editLoading}>
+                  {editLoading ? "Saving..." : "Save Changes"}
+                </button>
+                <button className="pc-btn-outline" onClick={() => setShowEditModal(false)}>
+                  Cancel
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </>
   );
 };
+
