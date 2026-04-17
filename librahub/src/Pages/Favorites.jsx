@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import "./studentHome.css";
-import { collection, getDocs, doc, deleteDoc, getDoc, serverTimestamp, addDoc } from "firebase/firestore";
+import { collection, getDocs, doc, deleteDoc, getDoc, serverTimestamp, addDoc,query,where } from "firebase/firestore";
 import { auth, db } from '../firebase';
 import { useNavigate } from "react-router-dom"; 
 
@@ -29,7 +29,14 @@ const Favorites = () => {
 
     const fetchFavorites = async () => {
         try {
-            const querySnapshot = await getDocs(collection(db, "favorites"));
+            const user=auth.currentUser;
+            if(!user){
+                setLoading(false);
+                return;
+            }
+            const q=query(collection(db,"favorites"),where("userId","==",user.uid));
+            const querySnapshot = await getDocs(q);
+
             const list = querySnapshot.docs.map(doc => ({
                 id: doc.id,
                 ...doc.data()
