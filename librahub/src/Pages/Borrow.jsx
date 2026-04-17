@@ -90,73 +90,79 @@ const Borrow = () => {
             alert("Failed to borrow book.");
         }
     };
-    const handleReturn = async () => {
-        try {
+const handleReturn = async () => {
+    try {
+        // 1️⃣ دور على الكتاب في books
+        const booksRef = collection(db, "books");
+        const q = query(
+            booksRef,
+            where("bookId", "==", Number(borrowData.bookCode))
+        );
 
+        const querySnapshot = await getDocs(q);
 
-            const booksRef = collection(db, "books");
-            const q = query(
-                booksRef,
-                where("bookId", "==", Number(borrowData.bookCode))
-            );
-
-            const querySnapshot = await getDocs(q);
-
-            if (querySnapshot.empty) {
-                setMessage(" Book not found.");
-                setColor("red");
-                return;
-            }
-
-            const bookDoc = querySnapshot.docs[0];
-            const bookData = bookDoc.data();
-
-
-            if (!bookData.isBorrowed) {
-                setMessage(" This book is not borrowed.");
-                setColor("#ffc107");
-                return;
-            }
-
-
-            await updateDoc(doc(db, "books", bookDoc.id), {
-                isBorrowed: false,
-                borrowedByCode: ""
-            });
-
-
-            const borrowRef = collection(db, "borrowedBooks");
-            const borrowQuery = query(
-                borrowRef,
-                where("bookDocId", "==", bookDoc.id),
-                where("status", "==", "borrowed")
-            );
-
-            const borrowSnapshot = await getDocs(borrowQuery);
-
-            if (!borrowSnapshot.empty) {
-                const borrowDoc = borrowSnapshot.docs[0];
-
-                await updateDoc(doc(db, "borrowedBooks", borrowDoc.id), {
-                    status: "returned",
-                    returnedAt: serverTimestamp()
-                });
-            }
-
-            setMessage("Book returned successfully!");
-            setColor("green");
-
-            setBorrowData({
-                studentName: "",
-                studentCode: "",
-                bookCode: ""
-            });
-         
-        } catch (error) {
-            console.error(error);
-            alert(" Failed to return book.");
+        if (querySnapshot.empty) {
+            setMessage("❌ Book not found.");
+            setColor("red");
+            return;
         }
-    };
+
+        const bookDoc = querySnapshot.docs[0];
+        const bookData = bookDoc.data();
+
+        // 2️⃣ تحقق إن الكتاب متأجر
+        if (!bookData.isBorrowed) {
+            setMessage("⚠️ This book is not currently borrowed.");
+            setColor("#ffc107");
+            return;
+        }
+
+        // 3️⃣ تحقق إن الطالب صح
+        if (String(bookData.borrowedByCode).trim() !== String(borrowData.studentCode).trim()) {
+            setMessage("❌ This book was borrowed by a different student.");
+            setColor("red");
+            return;
+        }
+
+        // 4️⃣ حدّث books
+        await updateDoc(doc(db, "books", bookDoc.id), {
+            isBorrowed: false,
+            borrowedByCode: ""
+        });
+
+        // 5️⃣ دور على borrowedBooks بـ bookId (مش bookDocId)
+        const borrowRef = collection(db, "borrowedBooks");
+        const borrowQuery = query(
+            borrowRef,
+            where("bookId", "==", bookDoc.id), // ✅ bookId مش bookDocId
+            where("status", "==", "borrowed")
+        );
+
+        const borrowSnapshot = await getDocs(borrowQuery);
+        console.log("Found borrow records:", borrowSnapshot.size); // للـ debugging
+
+        if (!borrowSnapshot.empty) {
+            const borrowDocRef = borrowSnapshot.docs[0];
+            await updateDoc(doc(db, "borrowedBooks", borrowDocRef.id), {
+                status: "returned",
+                returnedAt: serverTimestamp()
+            });
+        }
+
+        setMessage("✅ Book returned successfully!");
+        setColor("green");
+
+        setBorrowData({
+            studentName: "",
+            studentCode: "",
+            bookCode: ""
+        });
+
+    } catch (error) {
+        console.error(error);
+        alert("Failed to return book.");
+    }
+};
 
 
 
