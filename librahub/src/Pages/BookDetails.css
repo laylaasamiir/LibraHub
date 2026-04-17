@@ -58,3 +58,11 @@
   text-align: center;
   margin-top: 100px;
 }
+.borrowed-status {
+  color: red;
+}
+
+.available-status {
+  color: green;
+}
+
