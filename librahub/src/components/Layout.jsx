@@ -21,7 +21,7 @@ const Layout = () => {
                     <FaHeart size={24} />
                     <span>Favs</span>
                 </Link>
-                <div className="nav-item" onClick={() => navigate('/')}>
+                <div className="nav-item" onClick={() => navigate('/login')}>
                     <FaSignOutAlt size={24} />
                     <span>Exit</span>
                 </div>

@@ -58,8 +58,49 @@ const Favorites = () => {
     };
 
     useEffect(() => {
-        fetchBooks().then(() => fetchFavorites());
-    }, [Object.keys(booksData).length]); 
+const unsubscribe = auth.onAuthStateChanged(async (user) => {
+        if (user) {
+            setLoading(true);
+           try{
+            const querySnapshot = await getDocs(collection(db, "books"));
+                const booksList = querySnapshot.docs.map(doc => ({
+                    id: doc.id,
+                    ...doc.data()
+                }));
+                
+                const booksMap = booksList.reduce((acc, book) => {
+                    acc[book.id] = book;
+                    return acc;
+                }, {});
+                setBooksData(booksMap);
+              
+                const q = query(collection(db, "favorites"), where("userId", "==", user.uid));
+                const favSnapshot = await getDocs(q);
+
+                const list = favSnapshot.docs.map(doc => ({
+                    id: doc.id,
+                    ...doc.data()
+                }));
+                const updatedFavorites = list.map(favItem => ({
+                        ...favItem,
+                        ...booksMap[favItem.bookId],
+                        id: favItem.bookId, 
+                        favDocId: favItem.id 
+                    }));
+
+                setFavBooks(updatedFavorites);
+             } catch (error) {
+                console.error("Error loading favorites:", error);
+           } 
+           setLoading(false);
+        } else {
+            setFavBooks([]);
+            setLoading(false);
+        }
+    });
+return () => unsubscribe();
+    }, []);
+       
 
     const removeFromFavorites = async (e, favDocId) => {
         e.stopPropagation();

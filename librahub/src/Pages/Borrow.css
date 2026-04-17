@@ -76,10 +76,10 @@
 
 .confirm {
   flex: 1;
-  background: linear-gradient(to right, #4e73df, #224abe);
+  background: linear-gradient(to right, #005ad6, #007aff);
 }
 
 .return {
   width: 180px;
-  background: #224abe;
+  background: #007aff;
 }
