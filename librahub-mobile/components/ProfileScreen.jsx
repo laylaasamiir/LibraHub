@@ -1,21 +1,21 @@
 import React from 'react';
-import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
+import { View, Text, StyleSheet , TouchableOpacity } from 'react-native';
 
-export default function ProfileScreen({ user, onLogout }) {
+export default function ProfileScreen({ user={}, onLogout }) {
   return (
     <View style={styles.container}>
       <View style={styles.header}>
-         
-        <Text style={styles.userName}>{user?.name || "User Name"}</Text>
-        <Text style={styles.userEmail}>{user?.email || " No Email"}</Text>
+        
+        <Text style={styles.userName}>{user.name || "User Name"}</Text>
+        <Text style={styles.userEmail}>{user.email}</Text>
       </View>
 
       <View style={styles.infoSection}>
         <Text style={styles.label}>Phone Number:</Text>
-        <Text style={styles.value}>{user?.phone || "Not set"}</Text>
+        <Text style={styles.value}>{user.phone || "Not set"}</Text>
         
         <Text style={styles.label}>Role:</Text>
-        <Text style={styles.value}>{user?.role || "Student"}</Text>
+        <Text style={styles.value}>{user.role || "Student"}</Text>
       </View>
 
       <TouchableOpacity style={styles.logoutButton} onPress={onLogout}>
