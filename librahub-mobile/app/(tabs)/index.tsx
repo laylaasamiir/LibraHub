@@ -161,71 +161,87 @@ export default function HomeScreen() {
     </View>
   );
 }
+
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#f0f2f5",
-    padding: 15,
+    backgroundColor: "#eef2f7",
+    paddingHorizontal: 15,
+    paddingTop: 15,
   },
 
   title: {
-    fontSize: 22,
+    fontSize: 26,
     fontWeight: "bold",
-    color: "#2f68aa",
-    marginBottom: 10,
+    color: "#1e3a8a",
+    marginBottom: 15,
   },
 
   search: {
-    backgroundColor: "white",
-    padding: 10,
-    borderRadius: 8,
-    marginBottom: 10,
+    backgroundColor: "#fff",
+    padding: 12,
+    borderRadius: 12,
+    marginBottom: 15,
+    borderWidth: 1,
+    borderColor: "#ddd",
   },
 
   card: {
-    backgroundColor: "white",
-    padding: 15,
-    borderRadius: 10,
-    marginBottom: 15,
+    backgroundColor: "#fff",
+    borderRadius: 16,
+    marginBottom: 18,
+    padding: 12,
+    shadowColor: "#000",
+    shadowOpacity: 0.1,
+    shadowRadius: 6,
+    elevation: 3,
   },
 
   heart: {
     position: "absolute",
-    right: 10,
-    top: 10,
-    zIndex: 1,
+    right: 12,
+    top: 12,
+    zIndex: 2,
+    backgroundColor: "#fff",
+    borderRadius: 50,
+    padding: 6,
+    elevation: 3,
   },
 
   image: {
     width: "100%",
-    height: 150,
-    borderRadius: 10,
+    height: 160,
+    borderRadius: 12,
     marginBottom: 10,
   },
 
   bookTitle: {
     fontSize: 18,
     fontWeight: "bold",
+    color: "#111",
+    marginBottom: 4,
   },
 
   author: {
-    color: "gray",
+    color: "#666",
     marginBottom: 10,
+    fontSize: 13,
   },
 
   btn: {
-    backgroundColor: "#2f68aa",
-    padding: 10,
-    borderRadius: 6,
+    backgroundColor: "#2563eb",
+    paddingVertical: 12,
+    borderRadius: 10,
     alignItems: "center",
   },
 
   disabledBtn: {
-    backgroundColor: "gray",
+    backgroundColor: "#9ca3af",
   },
 
   btnText: {
-    color: "white",
+    color: "#fff",
     fontWeight: "bold",
+    fontSize: 14,
   },
 });
