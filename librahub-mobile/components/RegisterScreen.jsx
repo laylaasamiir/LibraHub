@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { View, Text, TextInput, TouchableOpacity, StyleSheet, Alert, ScrollView } from "react-native";
 import { createUserWithEmailAndPassword } from "firebase/auth";
-import { auth, dp } from '../components/firebase'; 
+import { auth, db } from '../components/firebase'; 
 import { doc, setDoc } from "firebase/firestore";
 import { Picker } from "@react-native-picker/picker";
 
@@ -28,12 +28,12 @@ export default function RegisterScreen({ onRegisterSuccess, onLoginPress }) {
             const res = await createUserWithEmailAndPassword(auth, email, password);
 
       
-            await setDoc(doc(dp, "users", res.user.uid), {
+            await setDoc(doc(db, "users", res.user.uid), {
                 name, email, role: "student", department, level, createdAt: Date.now(),
             });
 
             Alert.alert("Success", "Account created successfully");
-            onRegisterSuccess();
+            router.replace("/(tabs)");
         } catch (e) {
             console.log(e.code);
             switch (e.code) {

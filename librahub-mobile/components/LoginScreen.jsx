@@ -13,7 +13,7 @@ export default function LoginScreen({ onLoginSuccess, onRegisterPress }) {
             const userCredential = await signInWithEmailAndPassword(auth, email, password);
             const user = userCredential.user;
 
-            const docRef = doc(dp, "users", user.uid);
+            const docRef = doc(db, "users", user.uid);
             const docSnap = await getDoc(docRef);
 
             if (docSnap.exists()) {
