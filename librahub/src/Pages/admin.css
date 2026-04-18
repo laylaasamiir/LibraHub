@@ -138,3 +138,31 @@ background-color:#f8d7da;
 .table-container a {
     text-decoration: none;
 }
+.nav-item-logout {
+    margin-top: auto;
+
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 20px;
+    cursor: pointer;
+    color: #5a7ea5;
+    font-size: 18px;
+    font-weight: 600;
+    transition: all 0.3s ease;
+    border-top: 1px solid #d1e3f8;
+    margin-bottom: 40px;
+}
+
+.nav-item-logout:hover {
+    background-color: #f0f7ff; 
+    color: #a93a07; 
+}
+
+.nav-item-logout svg {
+    transition: transform 0.3s ease;
+}
+
+.nav-item-logout:hover svg {
+    transform: translateX(-3px);
+}
