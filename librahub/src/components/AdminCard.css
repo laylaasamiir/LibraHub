@@ -1,0 +1,433 @@
+
+.ac-card {
+  background: #fff;
+  border-radius: 24px;
+  box-shadow: 0 8px 40px rgba(30, 60, 120, 0.10);
+  max-width: 520px;
+  width: 100%;
+  margin: 40px auto;
+  overflow: visible;
+  position: relative;
+  padding-bottom: 36px;
+}
+
+.ac-header-band {
+  height: 110px;
+  background: linear-gradient(120deg, #1a3a8f 0%, #2563eb 60%, #60a5fa 100%);
+  border-radius: 24px 24px 0 0;
+  position: relative;
+}
+
+.ac-header-band::after {
+  content: "👑";
+  position: absolute;
+  right: 24px;
+  top: 16px;
+  font-size: 28px;
+  opacity: 0.35;
+}
+
+.ac-avatar-wrapper {
+  display: flex;
+  justify-content: center;
+  position: relative;
+  margin-top: -54px;
+  z-index: 2;
+}
+
+.ac-avatar-ring {
+  width: 108px;
+  height: 108px;
+  border-radius: 50%;
+  border: 4px solid #fff;
+  box-shadow: 0 4px 20px rgba(37, 99, 235, 0.18);
+  overflow: hidden;
+  background: #e8f0fe;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.ac-avatar-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.ac-avatar-placeholder {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #2563eb;
+}
+
+.ac-avatar-placeholder svg {
+  width: 54px;
+  height: 54px;
+}
+
+.ac-avatar-upload-btn {
+  position: absolute;
+  bottom: 4px;
+  right: calc(50% - 58px);
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  background: #2563eb;
+  border: 2px solid #fff;
+  color: #fff;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 2px 8px rgba(37, 99, 235, 0.25);
+  transition: background 0.2s;
+  z-index: 3;
+}
+
+.ac-avatar-upload-btn:hover {
+  background: #1a3a8f;
+}
+
+.ac-avatar-upload-btn svg {
+  width: 14px;
+  height: 14px;
+}
+
+/* Name & Badge */
+.ac-name {
+  text-align: center;
+  font-size: 1.35rem;
+  font-weight: 700;
+  color: #1e293b;
+  margin: 14px 0 4px;
+  letter-spacing: 0.3px;
+}
+
+.ac-role-badge {
+  display: block;
+  text-align: center;
+  margin: 0 auto 22px;
+  width: fit-content;
+  padding: 3px 18px;
+  border-radius: 20px;
+  background: linear-gradient(90deg, #1a3a8f, #2563eb);
+  color: #fff;
+  font-size: 0.7rem;
+  font-weight: 700;
+  letter-spacing: 1.5px;
+}
+
+/* Info Table */
+.ac-table {
+  margin: 0 28px 28px;
+  border-radius: 14px;
+  overflow: hidden;
+  border: 1px solid #e8f0fe;
+}
+
+.ac-row {
+  display: flex;
+  align-items: center;
+  padding: 14px 20px;
+  border-bottom: 1px solid #f1f5f9;
+  gap: 14px;
+  transition: background 0.15s;
+}
+
+.ac-row:last-child {
+  border-bottom: none;
+}
+
+.ac-row:hover {
+  background: #f8faff;
+}
+
+.ac-row-icon {
+  font-size: 1.1rem;
+  min-width: 24px;
+  text-align: center;
+}
+
+.ac-row-content {
+  flex: 1;
+  min-width: 0;
+}
+
+.ac-label {
+  font-size: 0.65rem;
+  font-weight: 700;
+  letter-spacing: 1.2px;
+  color: #94a3b8;
+  text-transform: uppercase;
+  margin-bottom: 2px;
+}
+
+.ac-value {
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: #1e293b;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* Actions */
+.ac-actions {
+  display: flex;
+  justify-content: center;
+  padding: 0 28px;
+  margin-top: 4px;
+}
+
+.ac-btn {
+  background: linear-gradient(90deg, #b45309, #c0392b);
+  color: #fff;
+  border: none;
+  border-radius: 10px;
+  padding: 11px 36px;
+  font-size: 0.95rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: opacity 0.2s, transform 0.15s;
+  display: flex;
+  align-items: center;
+  gap: 7px;
+}
+
+.ac-btn:hover {
+  opacity: 0.92;
+  transform: translateY(-1px);
+}
+
+/* Skeleton */
+.ac-skeleton {
+  display: inline-block;
+  height: 14px;
+  border-radius: 6px;
+  background: linear-gradient(90deg, #e2e8f0 25%, #f1f5f9 50%, #e2e8f0 75%);
+  background-size: 200% 100%;
+  animation: acSkeletonShimmer 1.4s infinite;
+  vertical-align: middle;
+}
+
+@keyframes acSkeletonShimmer {
+  0% { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
+}
+
+/* Modal Overlay */
+.ac-modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(15, 23, 42, 0.45);
+  backdrop-filter: blur(3px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  padding: 16px;
+}
+
+.ac-modal {
+  background: #fff;
+  border-radius: 20px;
+  padding: 32px 28px 24px;
+  width: 100%;
+  max-width: 420px;
+  position: relative;
+  box-shadow: 0 20px 60px rgba(30, 60, 120, 0.16);
+  animation: acModalIn 0.22s ease;
+}
+
+@keyframes acModalIn {
+  from { opacity: 0; transform: scale(0.95) translateY(12px); }
+  to   { opacity: 1; transform: scale(1) translateY(0); }
+}
+
+.ac-modal-close {
+  position: absolute;
+  top: 14px;
+  right: 16px;
+  background: #f1f5f9;
+  border: none;
+  border-radius: 50%;
+  width: 30px;
+  height: 30px;
+  font-size: 0.85rem;
+  cursor: pointer;
+  color: #64748b;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.2s;
+}
+
+.ac-modal-close:hover { background: #e2e8f0; }
+
+.ac-modal-title {
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: #1e293b;
+  margin-bottom: 22px;
+  text-align: center;
+}
+
+/* Password Form */
+.ac-edit-form {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.ac-edit-field label {
+  display: block;
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: #64748b;
+  margin-bottom: 5px;
+  letter-spacing: 0.5px;
+}
+
+.ac-password-input {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.ac-password-input input {
+  width: 100%;
+  border: 1.5px solid #e2e8f0;
+  border-radius: 9px;
+  padding: 10px 38px 10px 12px;
+  font-size: 0.9rem;
+  color: #1e293b;
+  background: #f8faff;
+  outline: none;
+  transition: border-color 0.2s;
+  box-sizing: border-box;
+}
+
+.ac-password-input input:focus {
+  border-color: #2563eb;
+  background: #fff;
+}
+
+.ac-password-input span {
+  position: absolute;
+  right: 10px;
+  cursor: pointer;
+  font-size: 1rem;
+  user-select: none;
+  color: #94a3b8;
+}
+
+.ac-forgot-btn {
+  background: none;
+  border: none;
+  color: #2563eb;
+  font-size: 0.8rem;
+  cursor: pointer;
+  text-align: left;
+  padding: 0;
+  text-decoration: underline;
+  transition: color 0.2s;
+}
+
+.ac-forgot-btn:hover { color: #1a3a8f; }
+.ac-forgot-btn:disabled { color: #94a3b8; cursor: default; }
+
+.ac-modal-actions {
+  display: flex;
+  gap: 10px;
+  margin-top: 6px;
+}
+
+.ac-modal-actions .ac-btn {
+  flex: 1;
+  justify-content: center;
+  padding: 11px 16px;
+}
+
+.ac-modal-actions .ac-btn-outline {
+  flex: 1;
+  background: transparent;
+  border: 1.5px solid #2563eb;
+  color: #2563eb;
+  border-radius: 10px;
+  padding: 11px 16px;
+  font-size: 0.95rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.ac-modal-actions .ac-btn-outline:hover {
+  background: #eff6ff;
+}
+
+.ac-error {
+  color: #dc2626;
+  font-size: 0.8rem;
+  text-align: center;
+}
+
+/* Avatar modal choices */
+.ac-modal-choices {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.ac-choice-btn {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  background: #f8faff;
+  border: 1.5px solid #e2e8f0;
+  border-radius: 10px;
+  padding: 13px 18px;
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: #1e293b;
+  cursor: pointer;
+  transition: border-color 0.2s, background 0.2s;
+}
+
+.ac-choice-btn:hover {
+  border-color: #2563eb;
+  background: #eff6ff;
+}
+
+.ac-modal-body {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  align-items: center;
+}
+
+.ac-webcam {
+  width: 100%;
+  border-radius: 10px;
+  max-height: 220px;
+  object-fit: cover;
+}
+
+.ac-preview-img {
+  width: 100%;
+  border-radius: 10px;
+  max-height: 220px;
+  object-fit: cover;
+}
+
+.ac-back-btn {
+  background: none;
+  border: none;
+  color: #2563eb;
+  font-size: 0.85rem;
+  cursor: pointer;
+  text-decoration: underline;
+  align-self: flex-start;
+}
