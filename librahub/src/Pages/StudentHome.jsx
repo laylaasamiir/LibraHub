@@ -1,10 +1,9 @@
 import React, { useState, useEffect } from "react";
 import "./studentHome.css";
-import { collection, addDoc, getDocs, query, where, doc, deleteDoc, getDoc, serverTimestamp, orderBy, startAt, endAt } from "firebase/firestore";
+import { collection, addDoc, getDocs, query, where, doc, deleteDoc, getDoc, serverTimestamp } from "firebase/firestore";
 import { auth, db } from '../firebase';
 import { FaHeart, FaSearch, FaFilter } from 'react-icons/fa';
-import { useLocation } from "react-router-dom";
-import { useNavigate } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 
 const StudentHome = () => {
     const navigate = useNavigate();
@@ -17,11 +16,33 @@ const StudentHome = () => {
     const [categories, setCategories] = useState([]);
     const [categorySearch, setCategorySearch] = useState("");
     const [showFilter, setShowFilter] = useState(false);
+    
+   
+    const [userRole, setUserRole] = useState(null);
+    const [showAuthModal, setShowAuthModal] = useState(false);
+    
     const location = useLocation();
 
-    const handleToggleFavorite = async (book) => {
-        const userId = auth.currentUser ? auth.currentUser.uid : "user_123";
+    useEffect(() => {
+        const fetchUserRole = async () => {
+            if (auth.currentUser) {
+                const userDoc = await getDoc(doc(db, "users", auth.currentUser.uid));
+                if (userDoc.exists()) {
+                    setUserRole(userDoc.data().role);
+                }
+            }
+        };
+        fetchUserRole();
+    }, []);
 
+    const handleToggleFavorite = async (book) => {
+       
+        if (!auth.currentUser || userRole !== 'student') {
+            setShowAuthModal(true);
+            return;
+        }
+
+        const userId = auth.currentUser.uid;
         if (favBooks.includes(book.id)) {
             setFavBooks(prev => prev.filter(id => id !== book.id));
             try {
@@ -34,41 +55,38 @@ const StudentHome = () => {
                 querySnapshot.forEach(async (document) => {
                     await deleteDoc(doc(db, "favorites", document.id));
                 });
-
-                console.log("Removed from favorites");
             } catch (e) {
                 console.error("Error removing:", e);
-
                 setFavBooks(prev => [...prev, book.id]);
             }
             return;
         }
+        
         setFavBooks(prev => [...prev, book.id]);
-
         try {
             await addDoc(collection(db, "favorites"), {
                 bookId: book.id,
                 title: book.title,
                 author: book.author,
                 image: book.coverUrl || book.image || "",
-                userId: auth.currentUser ? auth.currentUser.uid : "user_123",
+                userId: userId,
                 addedAt: new Date()
             });
-
-            console.log("Saved to firebase");
         } catch (e) {
             console.error(e);
             setFavBooks(prev => prev.filter(id => id !== book.id));
         }
     };
+
     const handleRequest = async (book) => {
+       
+        if (!auth.currentUser || userRole !== 'student') {
+            setShowAuthModal(true);
+            return;
+        }
+
         try {
             const user = auth.currentUser;
-            if (!user) {
-                alert("Please log in to request books.");
-                return;
-            }
-
             const userRef = doc(db, "users", user.uid);
             const userSnap = await getDoc(userRef);
 
@@ -78,10 +96,6 @@ const StudentHome = () => {
             }
 
             const studentData = userSnap.data();
-
-
-
-
             await addDoc(collection(db, "borrowRequests"), {
                 studentId: user.uid,
                 studentName: studentData.fullName || "",
@@ -93,17 +107,13 @@ const StudentHome = () => {
                 requestedAt: serverTimestamp()
             });
             setRequestedBooks(prev => [...prev, book.id]);
-
-            alert("Request sent successfully");
-
+            alert("Request sent successfully ✅");
         } catch (error) {
             console.error("Error sending request:", error);
-            alert("Failed to send request");
         }
+    };
 
-
-    }
-
+   
     useEffect(() => {
         if (location.state?.resetCategory) {
             setSelectedCategory("All");
@@ -113,15 +123,12 @@ const StudentHome = () => {
     useEffect(() => {
         const fetchBooksAndFavs = async () => {
             try {
-
                 const booksSnapshot = await getDocs(collection(db, "books"));
                 let booksData = booksSnapshot.docs.map(doc => ({
                     id: doc.id,
                     ...doc.data()
                 }));
 
-
-               
                 if (searchTerm.trim() !== "") {
                     const lowerSearch = searchTerm.toLowerCase();
                     booksData = booksData.filter(book =>
@@ -129,16 +136,10 @@ const StudentHome = () => {
                         book.author?.toString().toLowerCase().includes(lowerSearch)
                     );
                 }
-
                 setBooks(booksData);
 
-
-                const uniqueCategories = ["All", ...new Set(booksData
-                    .map(b => b.category)
-                    .filter(Boolean)
-                )];
+                const uniqueCategories = ["All", ...new Set(booksData.map(b => b.category).filter(Boolean))];
                 setCategories(uniqueCategories);
-
 
                 if (auth.currentUser) {
                     const userId = auth.currentUser.uid;
@@ -147,16 +148,11 @@ const StudentHome = () => {
                     const favIds = favSnapshot.docs.map(doc => String(doc.data().bookId));
                     setFavBooks(favIds);
 
-                    const reqQuery = query(
-                        collection(db, "borrowRequests"),
-                        where("studentId", "==", userId),
-                        where("status", "==", "pending")
-                    );
+                    const reqQuery = query(collection(db, "borrowRequests"), where("studentId", "==", userId), where("status", "==", "pending"));
                     const reqSnapshot = await getDocs(reqQuery);
                     const reqIds = reqSnapshot.docs.map(doc => doc.data().bookId);
                     setRequestedBooks(reqIds);
                 }
-
                 setLoading(false);
             } catch (error) {
                 console.error(error);
@@ -164,85 +160,58 @@ const StudentHome = () => {
             }
         };
 
-        const timeOutId = setTimeout(() => {
-            fetchBooksAndFavs();
-        }, 400);
-
+        const timeOutId = setTimeout(() => fetchBooksAndFavs(), 400);
         return () => clearTimeout(timeOutId);
-    }, [searchTerm]); // 
+    }, [searchTerm]);
 
+    const filteredBooks = selectedCategory === "All" ? books : books.filter(b => b.category === selectedCategory);
 
-    const filteredBooks = selectedCategory === "All"
-        ? books
-        : books.filter(b => b.category === selectedCategory);
     if (loading) return <div className="loading"><h2>Loading... 📚</h2></div>;
-
-
 
     return (
         <>
-            {/* Overlay */}
-            {showFilter && (
-                <div className="filter-overlay" onClick={() => setShowFilter(false)} />
+          
+            {showAuthModal && (
+                <div className="auth-modal-overlay" onClick={() => setShowAuthModal(false)}>
+                    <div className="guest-card auth-modal-content" onClick={(e) => e.stopPropagation()}>
+                        <button className="close-modal-btn" onClick={() => setShowAuthModal(false)}>×</button>
+                        <div className="guest-icon">📚</div>
+                        <h2>Student Access Only</h2>
+                        <p>To request books or add to favorites, you must be logged in with a Student account.</p>
+                        <button className="login-btn" onClick={() => navigate("/login")}>
+                            Login Now
+                        </button>
+                    </div>
+                </div>
             )}
 
-            {/* Sidebar */}
+            {showFilter && <div className="filter-overlay" onClick={() => setShowFilter(false)} />}
+
             <div className={`filter-sidebar ${showFilter ? "open" : ""}`}>
                 <h3>📂 Categories</h3>
-                <input
-                    type="text"
-                    placeholder="Search category..."
-                    value={categorySearch}
-                    onChange={(e) => setCategorySearch(e.target.value)}
-                    className="category-search"
-                />
-
-                {categories
-                    .filter(cat => cat.toLowerCase().includes(categorySearch.toLowerCase()))
-                    .map(cat => (
-                        <button
-                            key={cat}
-                            className={`category-btn ${selectedCategory === cat ? "active" : ""}`}
-                            onClick={() => { setSelectedCategory(cat); setShowFilter(false); }}
-                        >
-                            {cat}
-                        </button>
-                    ))}
+                <input type="text" placeholder="Search category..." value={categorySearch} onChange={(e) => setCategorySearch(e.target.value)} className="category-search" />
+                {categories.filter(cat => cat.toLowerCase().includes(categorySearch.toLowerCase())).map(cat => (
+                    <button key={cat} className={`category-btn ${selectedCategory === cat ? "active" : ""}`} onClick={() => { setSelectedCategory(cat); setShowFilter(false); }}>
+                        {cat}
+                    </button>
+                ))}
             </div>
-
 
             <div className="home-container">
                 <h1 className="home-title">Available Books 📚</h1>
-
                 <div className="search-filter-wrapper">
                     <div className="search-bar">
                         <FaSearch className="search-icon" />
-                        <input
-                            type="text"
-                            placeholder="Search ..."
-                            value={searchTerm}
-                            onChange={(e) => setSearchTerm(e.target.value)}
-                        />
-                        <FaFilter
-                            className="filter-icon"
-                            onClick={() => setShowFilter(!showFilter)}
-                        />
+                        <input type="text" placeholder="Search ..." value={searchTerm} onChange={(e) => setSearchTerm(e.target.value)} />
+                        <FaFilter className="filter-icon" onClick={() => setShowFilter(!showFilter)} />
                     </div>
                 </div>
 
                 <div className="books-grid">
                     {filteredBooks.length > 0 ? (
-
                         filteredBooks.map((book) => (
-                            <div
-                                key={book.id}
-                                className="book-card"
-                                onClick={() => navigate("/book-details", { state: book })}
-                            >
-                                <div className="favorite-icon" onClick={(e) => {
-                                    e.stopPropagation();
-                                    handleToggleFavorite(book);
-                                }}>
+                            <div key={book.id} className="book-card" onClick={() => navigate("/book-details", { state: book })}>
+                                <div className="favorite-icon" onClick={(e) => { e.stopPropagation(); handleToggleFavorite(book); }}>
                                     <FaHeart className={favBooks.includes(String(book.id)) ? "heart-filled" : "heart-empty"} />
                                 </div>
                                 <img src={book.coverUrl || book.image || "https://via.placeholder.com/150"} alt={book.title} className="book-image" />
@@ -250,42 +219,22 @@ const StudentHome = () => {
                                     <h3>{book.title}</h3>
                                     <p className="author">By: {book.author}</p>
                                     <p className="description">{book.description}</p>
-
-                                    <button
-                                        className={`request-btn ${book.isBorrowed
-                                            ? "borrowed-btn"
-                                            : requestedBooks.includes(book.id)
-                                                ? "requested-btn"
-                                                : ""
-                                            }`}
+                                    <button 
+                                        className={`request-btn ${book.isBorrowed ? "borrowed-btn" : requestedBooks.includes(book.id) ? "requested-btn" : ""}`}
                                         disabled={book.isBorrowed || requestedBooks.includes(book.id)}
-                                        onClick={(e) => {
-                                            e.stopPropagation();
-                                            handleRequest(book);
-                                        }}
+                                        onClick={(e) => { e.stopPropagation(); handleRequest(book); }}
                                     >
-                                        {book.isBorrowed
-                                            ? "Borrowed"
-                                            : requestedBooks.includes(book.id)
-                                                ? "Requested"
-                                                : "Request Book"}
+                                        {book.isBorrowed ? "Borrowed" : requestedBooks.includes(book.id) ? "Requested" : "Request Book"}
                                     </button>
                                 </div>
                             </div>
                         ))
                     ) : (
-
                         <div className="no-results">
                             <div className="no-results-content">
                                 <span>🔍</span>
                                 <h3>No books found matching "{searchTerm}"</h3>
-                                <p>Try searching with a different name or author.</p>
-                                <button
-                                    className="reset-search-btn"
-                                    onClick={() => setSearchTerm("")}
-                                >
-                                    Clear Search
-                                </button>
+                                <button className="reset-search-btn" onClick={() => setSearchTerm("")}>Clear Search</button>
                             </div>
                         </div>
                     )}

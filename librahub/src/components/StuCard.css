@@ -414,9 +414,29 @@
   text-align: center;
 }
 
-/* Error message */
+
 .pc-error {
   color: red;
   font-size: 13px;
   text-align: center;
+}
+.pc-forgot-btn {
+    background: none;
+    border: none;
+    color: #5e9efe;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    text-decoration: underline;
+    padding: 4px 0;
+    transition: color 0.2s;
+}
+
+.pc-forgot-btn:hover {
+    color: #5e9efe
+}
+
+.pc-forgot-btn:disabled {
+    color: #fafafa;
+    cursor: not-allowed;
 }
