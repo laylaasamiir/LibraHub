@@ -14,8 +14,12 @@ export default function Login() {
       await signInWithEmailAndPassword(auth, email, password);
       router.replace("/(tabs)");
     } catch (e) {
-      alert(e.message);
-    }
+  if (e instanceof Error) {
+    alert(e.message);
+  } else {
+    alert("An error occurred");
+  }
+}
   };
 
   return (
