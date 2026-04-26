@@ -10,67 +10,104 @@ import {
   Alert,
 } from "react-native";
 
-import { collection, getDocs, addDoc } from "firebase/firestore";
+import {
+  collection,
+  getDocs,
+  addDoc,
+  query,
+  where,
+  onSnapshot,
+  deleteDoc,
+  doc,
+} from "firebase/firestore";
+
 import { auth, db } from "../../components/firebase";
 import { MaterialIcons } from "@expo/vector-icons";
 
 export default function HomeScreen() {
   const [books, setBooks] = useState([]);
-  const [favBooks, setFavBooks] = useState([]);
+  const [favBooks, setFavBooks] = useState([]); 
   const [searchTerm, setSearchTerm] = useState("");
   const [requestedBooks, setRequestedBooks] = useState([]);
 
   useEffect(() => {
-
-    
     const fetchBooks = async () => {
-  try {
-    const snap = await getDocs(collection(db, "books"));
+      try {
+        const snap = await getDocs(collection(db, "books"));
 
-    const data = snap.docs.map((doc) => {
-      const bookData = doc.data() || {};
+        const data = snap.docs.map((doc) => {
+          const bookData = doc.data() || {};
 
-      return {
-        id: doc.id,
-        title: typeof bookData.title === "string" ? bookData.title : "",
-        author: typeof bookData.author === "string" ? bookData.author : "",
-        coverUrl: typeof bookData.coverUrl === "string" ? bookData.coverUrl : "",
-        category: typeof bookData.category === "string" ? bookData.category : "",
-      };
-    });
+          return {
+            id: doc.id,
+            title: bookData.title || "",
+            author: bookData.author || "",
+            coverUrl: bookData.coverUrl || "",
+            category: bookData.category || "",
+          };
+        });
 
-    console.log("DATA:", data); 
-
-    setBooks(Array.isArray(data) ? data : []); 
-  } catch (error) {
-    console.log("ERROR FULL:", error);
-    Alert.alert("Error", error.message);
-  }
-};
+        setBooks(data);
+      } catch (error) {
+        console.log(error);
+        Alert.alert("Error", error.message);
+      }
+    };
 
     fetchBooks();
   }, []);
 
-  const toggleFav = async (book) => {
-    const userId = auth.currentUser?.uid;
-    if (!userId) return Alert.alert("Login required");
+  useEffect(() => {
+    const user = auth.currentUser;
+    if (!user) return;
 
-    try {
-      if (favBooks.includes(book.id)) {
-        setFavBooks((prev) => prev.filter((id) => id !== book.id));
-      } else {
-        setFavBooks((prev) => [...prev, book.id]);
+    const q = query(
+      collection(db, "favorites"),
+      where("userId", "==", user.uid)
+    );
 
-        await addDoc(collection(db, "favorites"), {
-          bookId: book.id,
-          userId,
-        });
-      }
-    } catch (e) {
-      console.log(e);
-      Alert.alert("Error updating favorites");
+    const unsubscribe = onSnapshot(q, (snapshot) => {
+      const favIds = snapshot.docs.map((doc) => doc.data().bookId);
+      setFavBooks(favIds);
+    });
+
+    return () => unsubscribe();
+  }, []);
+
+  cconst toggleFav = async (book) => {
+  const userId = auth.currentUser?.uid;
+  if (!userId) return Alert.alert("Login required");
+
+  const isFav = favBooks.includes(book.id);
+
+  try {
+    if (isFav) {
+      setFavBooks((prev) => prev.filter((id) => id !== book.id));
+    } else {
+      setFavBooks((prev) => [...prev, book.id]);
     }
-  };
+
+    const q = query(
+      collection(db, "favorites"),
+      where("userId", "==", userId),
+      where("bookId", "==", book.id)
+    );
+
+    const snap = await getDocs(q);
+
+    if (!snap.empty) {
+      await deleteDoc(doc(db, "favorites", snap.docs[0].id));
+    } else {
+      await addDoc(collection(db, "favorites"), {
+        bookId: book.id,
+        userId,
+      });
+    }
+  } catch (e) {
+    console.log(e);
+    Alert.alert("Error updating favorites");
+  }
+};
 
   const requestBook = async (book) => {
     const user = auth.currentUser;
@@ -111,10 +148,14 @@ export default function HomeScreen() {
         keyExtractor={(item) => item.id}
         renderItem={({ item }) => (
           <View style={styles.card}>
+          
             <Pressable
-              style={styles.heart}
-              onPress={() => toggleFav(item)}
-            >
+  style={styles.heart}
+  onPress={() => {
+    console.log("HEART CLICKED");
+    toggleFav(item);
+  }}
+>
               <MaterialIcons
                 name={
                   favBooks.includes(item.id)
@@ -169,7 +210,7 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: "#eef2f7",
     paddingHorizontal: 15,
-    paddingTop: 15,
+    paddingTop: 50,
   },
 
   title: {
@@ -177,6 +218,7 @@ const styles = StyleSheet.create({
     fontWeight: "bold",
     color: "#1e3a8a",
     marginBottom: 15,
+    textAlign: "center",
   },
 
   search: {
@@ -186,6 +228,8 @@ const styles = StyleSheet.create({
     marginBottom: 15,
     borderWidth: 1,
     borderColor: "#ddd",
+    alignSelf: "center",
+    width: "90%",
   },
 
   card: {
@@ -193,22 +237,19 @@ const styles = StyleSheet.create({
     borderRadius: 16,
     marginBottom: 18,
     padding: 12,
-    shadowColor: "#000",
-    shadowOpacity: 0.1,
-    shadowRadius: 6,
     elevation: 3,
   },
 
   heart: {
-    position: "absolute",
-    right: 12,
-    top: 12,
-    zIndex: 2,
-    backgroundColor: "#fff",
-    borderRadius: 50,
-    padding: 6,
-    elevation: 3,
-  },
+  position: "absolute",
+  right: 12,
+  top: 12,
+  zIndex: 999,
+  elevation: 20,
+  backgroundColor: "#fff",
+  borderRadius: 50,
+  padding: 8,
+},
 
   image: {
     width: "100%",
@@ -220,7 +261,6 @@ const styles = StyleSheet.create({
   bookTitle: {
     fontSize: 18,
     fontWeight: "bold",
-    color: "#111",
     marginBottom: 4,
   },
 
@@ -244,6 +284,5 @@ const styles = StyleSheet.create({
   btnText: {
     color: "#fff",
     fontWeight: "bold",
-    fontSize: 14,
   },
 });
