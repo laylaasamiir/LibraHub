@@ -74,7 +74,7 @@ export default function HomeScreen() {
     return () => unsubscribe();
   }, []);
 
-  cconst toggleFav = async (book) => {
+  const toggleFav = async (book) => {
   const userId = auth.currentUser?.uid;
   if (!userId) return Alert.alert("Login required");
 
