@@ -126,9 +126,7 @@ export default function AdminRegister() {
 
           </form>
 
-          <p className="login-footer">
-            Back to <Link to="/Admin" className="login-link">Dashboard</Link>
-          </p>
+       
 
         </div>
       </main>

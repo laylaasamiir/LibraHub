@@ -80,16 +80,13 @@ const AdminRequests = () => {
       });
 
       await addDoc(collection(db, "borrowedBooks"), {
-        userId: req.studentId,  
+        studentId: req.studentId,
         studentName: req.studentName || "",
+        studentEmail: req.studentEmail || "",
         studentCode: req.studentCode || "",
         bookId: req.bookId,
-<<<<<<< Updated upstream
         bookCode: req.realBookCode || "",
         bookTitle: req.bookTitle || "",
-=======
-        bookTitle: req.bookTitle,
->>>>>>> Stashed changes
         borrowedAt: serverTimestamp(),
         status: "borrowed",
       });

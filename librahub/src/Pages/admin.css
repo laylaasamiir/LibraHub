@@ -5,7 +5,7 @@
     margin: 0;
 }
 .sidebarAdmin{
-    background-color:#0d6efd;
+    background-color:aliceblue;
     display: flex;
     flex-direction: column;
     width: 240px;
@@ -17,24 +17,152 @@
 
 }
 .sidebarAdmin a{
-    color:white;
+    color:#2f77c9;
     text-decoration:none;
     padding: 15px 20px;
     font-size: 18px;
 }       
 .sidebarAdmin h1{
-    color: aliceblue;
+    color: #2f68aa;
     font-weight: 700;
     margin-bottom: 20px;
     padding: 20px;
 
 }
 .sidebarAdmin a:hover{
-background-color:rgba(255,255,255,0.2);
+background-color:#f8d7da;
 }
 .content{
     flex:1;
     margin-left: 240px;
     padding: 20px;
     background-color: #f5f5f5;
+}
+
+.showAdmin-container {
+    padding: 20px;
+    background-color: #f0f7ff; 
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.showAdmin-table {
+    width: 100%;
+    max-width: 900px;
+    background: white;
+    border-collapse: separate;
+    border-spacing: 0;
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08); 
+    margin-top: 20px;
+}
+
+.showAdmin-table caption {
+    background-color: #3498db;
+    color: white;
+    padding: 15px;
+    font-size: 20px;
+    font-weight: bold;
+    border-top-left-radius: 12px;
+    border-top-right-radius: 12px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+.showAdmin-table th {
+    background-color: #ebf5ff; 
+    color: #2c3e50;
+    padding: 15px;
+    text-align: left;
+    font-weight: 700;
+    border-bottom: 2px solid #d1e8ff;
+}
+
+.showAdmin-table td {
+    padding: 14px 15px;
+    color: #444;
+    border-bottom: 1px solid #f0f0f0;
+    font-size: 15px;
+}
+
+.showAdmin-table tr:hover {
+    background-color: #f9fcff; 
+}
+
+
+.showAdmin-table button {
+    background-color: #ff4757;
+    color: white;
+    border: none;
+    border-radius: 6px;
+    padding: 8px 16px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.showAdmin-table button:hover {
+    background-color: #e84118;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 8px rgba(232, 65, 24, 0.2);
+}
+
+
+.add-admin {
+    background-color: #005ad6;
+    color: white;
+    border: none;
+    border-radius: 50%; 
+    width: 50px;
+    height: 50px;
+    font-size: 24px;
+    cursor: pointer;
+    font-weight: bold;
+    box-shadow: 0 5px 15px #d3bbbd;
+    margin-top: 25px;
+    transition: all 0.3s ease;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.add-admin:hover {
+    background-color: #007aff;
+    transform: scale(1.1) rotate(90deg);
+}
+
+
+.table-container a {
+    text-decoration: none;
+}
+.nav-item-logout {
+    margin-top: auto;
+
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 20px;
+    cursor: pointer;
+    color: #5a7ea5;
+    font-size: 18px;
+    font-weight: 600;
+    transition: all 0.3s ease;
+    border-top: 1px solid #d1e3f8;
+    margin-bottom: 40px;
+}
+
+.nav-item-logout:hover {
+    background-color: #f0f7ff; 
+    color: #a93a07; 
+}
+
+.nav-item-logout svg {
+    transition: transform 0.3s ease;
+}
+
+.nav-item-logout:hover svg {
+    transform: translateX(-3px);
 }

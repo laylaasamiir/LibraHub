@@ -90,6 +90,9 @@
   border-radius:4px;
 }
 
+.delete-btn:hover{
+  background:#c0392b;
+}
 .print-btn{
   background:#3498db;
   color:white;
@@ -97,4 +100,234 @@
   padding:6px 10px;
   cursor:pointer;
   border-radius:4px;
+}
+
+.print-btn:hover{
+  background:#0a507e;
+}
+
+.edit-btn {
+    background: #3498db;
+    color: white;
+    border: none;
+    padding: 6px 10px;
+    margin-right: 5px;
+    cursor: pointer;
+    border-radius: 4px;
+    font-size: 14px;
+    transition: background 0.3s;
+}
+
+.edit-btn:hover {
+    background: #0a507e;
+}
+.books-table td:last-child {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+    align-items: center;
+}
+
+.edit-btn, .delete-btn, .print-btn {
+    width: 100%;
+    max-width: 100px;
+    margin-right: 0;
+}
+
+.modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.5);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+}
+
+.modal-content {
+    background: white;
+    padding: 25px;
+    border-radius: 12px;
+    width: 90%;
+    max-width: 400px;
+}
+
+.modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 15px;
+}
+
+.close-x {
+    background: none;
+    border: none;
+    font-size: 24px;
+    cursor: pointer;
+}
+
+.modal-actions {
+    display: flex;
+    gap: 10px;
+    margin-top: 15px;
+}
+
+.cancel-btn {
+    flex: 1;
+    padding: 10px;
+    background: #ccc;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+}
+
+
+.pc-modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.6);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+}
+
+.pc-modal {
+    background: white;
+    padding: 25px;
+    border-radius: 15px;
+    width: 90%;
+    max-width: 400px;
+    position: relative;
+    text-align: center;
+}
+
+.pc-modal-close {
+    position: absolute;
+    right: 15px;
+    top: 10px;
+    background: none;
+    border: none;
+    font-size: 20px;
+    cursor: pointer;
+}
+
+.pc-modal-choices {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    margin-top: 20px;
+}
+
+.pc-choice-btn {
+    padding: 15px;
+    border: 1px solid #e2e8f0;
+    border-radius: 10px;
+    background: #fff;
+    cursor: pointer;
+    font-size: 16px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+}
+
+.pc-choice-btn:hover {
+    background: #f7fafc;
+}
+
+.pc-webcam {
+    width: 100%;
+    border-radius: 10px;
+    margin-bottom: 15px;
+}
+.image-upload-section {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin-bottom: 20px;
+}
+
+.upload-placeholder {
+    width: 150px;
+    height: 180px;
+    border: 2px dashed #2f68aa;
+    border-radius: 10px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    cursor: pointer;
+    background: #f9fafb;
+    color: #2f68aa;
+    transition: all 0.3s ease;
+}
+
+.book-preview-img {
+    width: 150px;
+    height: 200px;
+    object-fit: cover;
+    border-radius: 10px;
+    margin-bottom: 10px;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+}
+
+.preview-container button {
+    background: #eee;
+    border: none;
+    padding: 5px 15px;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+.pc-preview-img {
+    width: 100%;
+    max-height: 250px;
+    object-fit: contain;
+    border-radius: 10px;
+    margin-bottom: 15px;
+}
+
+.pc-modal-actions {
+    display: flex;
+    gap: 10px;
+    justify-content: center;
+}
+
+.pc-btn {
+    background: #27ae60;
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+.pc-btn-outline {
+    background: none;
+    border: 1px solid #ccc;
+    padding: 10px 20px;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+.pc-back-btn {
+    margin-top: 15px;
+    background: none;
+    border: none;
+    color: #2f68aa;
+    cursor: pointer;
+    text-decoration: underline;
+}
+
+.books-table img {
+    width: 50px;
+    height: 70px;
+    object-fit: cover;
+    border-radius: 4px;
 }
