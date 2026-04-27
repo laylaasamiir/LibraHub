@@ -1,43 +1,34 @@
-import { Stack, useRouter, useSegments } from "expo-router";
+import { Stack } from "expo-router";
 import { useEffect, useState } from "react";
 import { auth } from "../components/firebase";
 import { onAuthStateChanged } from "firebase/auth";
+import { useRouter } from "expo-router";
 
 export default function RootLayout() {
   const router = useRouter();
-  const segments = useSegments();
 
   const [user, setUser] = useState(null);
-  const [loading, setLoading] = useState(true); 
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const unsub = onAuthStateChanged(auth, (u) => {
       setUser(u);
-      setLoading(false); 
+      setLoading(false);
     });
 
     return unsub;
   }, []);
 
   useEffect(() => {
-    if (loading) return; 
+    if (loading) return;
 
-    const inLogin = segments[0] === "login";
-    const inTabs = segments[0] === "(tabs)";
-
-    if (!user && !inLogin) {
-      router.replace("/login");
-    } else if (user && !inTabs) {
+    if (user) {
       router.replace("/(tabs)");
-    }
-  }, [user, segments, loading]);
+    } else {
+     router.replace("/");    }
+  }, [user, loading]);
 
-  if (loading) return null; 
+  if (loading) return null;
 
-  return (
-    <Stack screenOptions={{ headerShown: false }}>
-      <Stack.Screen name="login" />
-      <Stack.Screen name="(tabs)" />
-    </Stack>
-  );
+  return <Stack screenOptions={{ headerShown: false }} />;
 }
