@@ -7,7 +7,6 @@ import {
   Pressable,
   Image,
   StyleSheet,
-  Alert,
 } from "react-native";
 
 import {
@@ -23,11 +22,24 @@ import {
 
 import { auth, db } from "../../components/firebase";
 import { MaterialIcons } from "@expo/vector-icons";
+import { onAuthStateChanged } from "firebase/auth";
 
 export default function HomeScreen() {
   const [books, setBooks] = useState([]);
-  const [favBooks, setFavBooks] = useState([]);
-const [searchTerm, setSearchTerm] = useState("");
+  const [favBooks, setFavBooks] = useState([]); // ARRAY ثابت
+  const [searchTerm, setSearchTerm] = useState("");
+  const [user, setUser] = useState(null);
+
+  // 🔐 Auth listener
+  useEffect(() => {
+    const unsub = onAuthStateChanged(auth, (u) => {
+      setUser(u);
+    });
+
+    return unsub;
+  }, []);
+
+
   useEffect(() => {
     const fetchBooks = async () => {
       const snap = await getDocs(collection(db, "books"));
@@ -38,8 +50,8 @@ const [searchTerm, setSearchTerm] = useState("");
     fetchBooks();
   }, []);
 
+
   useEffect(() => {
-    const user = auth.currentUser;
     if (!user) return;
 
     const q = query(
@@ -49,15 +61,17 @@ const [searchTerm, setSearchTerm] = useState("");
 
     const unsub = onSnapshot(q, (snap) => {
       const ids = snap.docs.map((d) => d.data().bookId);
-      setFavBooks(ids);
+      setFavBooks(ids); // array
     });
 
-    return () => unsub();
-  }, []);
+    return unsub;
+  }, [user]);
+
 
   const toggleFav = async (book) => {
-    const user = auth.currentUser;
     if (!user) return;
+
+    const isFav = favBooks.includes(book.id);
 
     const q = query(
       collection(db, "favorites"),
@@ -67,19 +81,55 @@ const [searchTerm, setSearchTerm] = useState("");
 
     const snap = await getDocs(q);
 
-    if (!snap.empty) {
-      await deleteDoc(doc(db, "favorites", snap.docs[0].id));
+    if (isFav) {
+      if (!snap.empty) {
+        await deleteDoc(doc(db, "favorites", snap.docs[0].id));
+      }
+
+      setFavBooks((prev) => prev.filter((id) => id !== book.id));
     } else {
       await addDoc(collection(db, "favorites"), {
         userId: user.uid,
         bookId: book.id,
       });
+
+      setFavBooks((prev) => [...prev, book.id]);
     }
   };
+
 
   const filtered = books.filter((b) =>
     (b.title || "").toLowerCase().includes(searchTerm.toLowerCase())
   );
+
+  const renderItem = ({ item }) => {
+    const isFav = favBooks.includes(item.id);
+
+    return (
+      <View style={styles.card}>
+        <Pressable
+          style={styles.heart}
+          onPress={() => toggleFav(item)}
+        >
+          <MaterialIcons
+            name={isFav ? "favorite" : "favorite-border"}
+            size={24}
+            color="red"
+          />
+        </Pressable>
+
+        <Image
+          source={{
+            uri: item.coverUrl || "https://dummyimage.com/150x150/ccc/000",
+          }}
+          style={styles.image}
+        />
+
+        <Text style={styles.bookTitle}>{item.title}</Text>
+        <Text style={styles.author}>{item.author}</Text>
+      </View>
+    );
+  };
 
   return (
     <View style={styles.container}>
@@ -95,32 +145,7 @@ const [searchTerm, setSearchTerm] = useState("");
       <FlatList
         data={filtered}
         keyExtractor={(item) => item.id}
-        renderItem={({ item }) => (
-          <View style={styles.card}>
-            <Pressable
-              style={styles.heart}
-              onPress={() => toggleFav(item)}
-            >
-              <MaterialIcons
-                name={favBooks.includes(item.id) ? "favorite" : "favorite-border"}
-                size={24}
-                color="red"
-              />
-            </Pressable>
-
-            <Image
-              source={{
-                uri:
-                  item.coverUrl ||
-                  "https://dummyimage.com/150x150/ccc/000",
-              }}
-              style={styles.image}
-            />
-
-            <Text style={styles.bookTitle}>{item.title}</Text>
-            <Text style={styles.author}>{item.author}</Text>
-          </View>
-        )}
+        renderItem={renderItem}
       />
     </View>
   );
