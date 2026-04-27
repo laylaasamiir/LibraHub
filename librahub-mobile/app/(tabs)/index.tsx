@@ -1,5 +1,4 @@
 import React, { useEffect, useState } from "react";
-import { StyleSheet } from "react-native";
 import {
   View,
   Text,
@@ -7,6 +6,7 @@ import {
   FlatList,
   Pressable,
   Image,
+  StyleSheet,
   Alert,
 } from "react-native";
 
@@ -26,32 +26,13 @@ import { MaterialIcons } from "@expo/vector-icons";
 
 export default function HomeScreen() {
   const [books, setBooks] = useState([]);
-  const [favBooks, setFavBooks] = useState([]); 
-  const [searchTerm, setSearchTerm] = useState("");
-  const [requestedBooks, setRequestedBooks] = useState([]);
-
+  const [favBooks, setFavBooks] = useState([]);
+const [searchTerm, setSearchTerm] = useState("");
   useEffect(() => {
     const fetchBooks = async () => {
-      try {
-        const snap = await getDocs(collection(db, "books"));
-
-        const data = snap.docs.map((doc) => {
-          const bookData = doc.data() || {};
-
-          return {
-            id: doc.id,
-            title: bookData.title || "",
-            author: bookData.author || "",
-            coverUrl: bookData.coverUrl || "",
-            category: bookData.category || "",
-          };
-        });
-
-        setBooks(data);
-      } catch (error) {
-        console.log(error);
-        Alert.alert("Error", error.message);
-      }
+      const snap = await getDocs(collection(db, "books"));
+      const data = snap.docs.map((d) => ({ id: d.id, ...d.data() }));
+      setBooks(data);
     };
 
     fetchBooks();
@@ -66,30 +47,21 @@ export default function HomeScreen() {
       where("userId", "==", user.uid)
     );
 
-    const unsubscribe = onSnapshot(q, (snapshot) => {
-      const favIds = snapshot.docs.map((doc) => doc.data().bookId);
-      setFavBooks(favIds);
+    const unsub = onSnapshot(q, (snap) => {
+      const ids = snap.docs.map((d) => d.data().bookId);
+      setFavBooks(ids);
     });
 
-    return () => unsubscribe();
+    return () => unsub();
   }, []);
 
   const toggleFav = async (book) => {
-  const userId = auth.currentUser?.uid;
-  if (!userId) return Alert.alert("Login required");
-
-  const isFav = favBooks.includes(book.id);
-
-  try {
-    if (isFav) {
-      setFavBooks((prev) => prev.filter((id) => id !== book.id));
-    } else {
-      setFavBooks((prev) => [...prev, book.id]);
-    }
+    const user = auth.currentUser;
+    if (!user) return;
 
     const q = query(
       collection(db, "favorites"),
-      where("userId", "==", userId),
+      where("userId", "==", user.uid),
       where("bookId", "==", book.id)
     );
 
@@ -99,36 +71,13 @@ export default function HomeScreen() {
       await deleteDoc(doc(db, "favorites", snap.docs[0].id));
     } else {
       await addDoc(collection(db, "favorites"), {
+        userId: user.uid,
         bookId: book.id,
-        userId,
       });
-    }
-  } catch (e) {
-    console.log(e);
-    Alert.alert("Error updating favorites");
-  }
-};
-
-  const requestBook = async (book) => {
-    const user = auth.currentUser;
-    if (!user) return Alert.alert("Please login");
-
-    try {
-      await addDoc(collection(db, "borrowRequests"), {
-        studentId: user.uid,
-        bookId: book.id,
-        status: "pending",
-      });
-
-      setRequestedBooks((prev) => [...prev, book.id]);
-      Alert.alert("Request sent");
-    } catch (e) {
-      console.log(e);
-      Alert.alert("Error sending request");
     }
   };
 
-  const filteredBooks = books.filter((b) =>
+  const filtered = books.filter((b) =>
     (b.title || "").toLowerCase().includes(searchTerm.toLowerCase())
   );
 
@@ -144,24 +93,16 @@ export default function HomeScreen() {
       />
 
       <FlatList
-        data={filteredBooks}
+        data={filtered}
         keyExtractor={(item) => item.id}
         renderItem={({ item }) => (
           <View style={styles.card}>
-          
             <Pressable
-  style={styles.heart}
-  onPress={() => {
-    console.log("HEART CLICKED");
-    toggleFav(item);
-  }}
->
+              style={styles.heart}
+              onPress={() => toggleFav(item)}
+            >
               <MaterialIcons
-                name={
-                  favBooks.includes(item.id)
-                    ? "favorite"
-                    : "favorite-border"
-                }
+                name={favBooks.includes(item.id) ? "favorite" : "favorite-border"}
                 size={24}
                 color="red"
               />
@@ -171,33 +112,13 @@ export default function HomeScreen() {
               source={{
                 uri:
                   item.coverUrl ||
-                  "https://dummyimage.com/150x150/cccccc/000000&text=No+Image",
+                  "https://dummyimage.com/150x150/ccc/000",
               }}
               style={styles.image}
             />
 
-            <Text style={styles.bookTitle}>
-              {item.title || "No title"}
-            </Text>
-
-            <Text style={styles.author}>
-              By: {item.author || "Unknown"}
-            </Text>
-
-            <Pressable
-              style={[
-                styles.btn,
-                requestedBooks.includes(item.id) && styles.disabledBtn,
-              ]}
-              onPress={() => requestBook(item)}
-              disabled={requestedBooks.includes(item.id)}
-            >
-              <Text style={styles.btnText}>
-                {requestedBooks.includes(item.id)
-                  ? "Requested"
-                  : "Request Book"}
-              </Text>
-            </Pressable>
+            <Text style={styles.bookTitle}>{item.title}</Text>
+            <Text style={styles.author}>{item.author}</Text>
           </View>
         )}
       />
@@ -209,80 +130,43 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: "#eef2f7",
-    paddingHorizontal: 15,
-    paddingTop: 50,
+    padding: 15,
   },
-
   title: {
-    fontSize: 26,
+    fontSize: 24,
     fontWeight: "bold",
-    color: "#1e3a8a",
-    marginBottom: 15,
     textAlign: "center",
+    marginBottom: 10,
   },
-
   search: {
     backgroundColor: "#fff",
-    padding: 12,
-    borderRadius: 12,
-    marginBottom: 15,
-    borderWidth: 1,
-    borderColor: "#ddd",
-    alignSelf: "center",
-    width: "90%",
+    padding: 10,
+    borderRadius: 10,
+    marginBottom: 10,
   },
-
   card: {
     backgroundColor: "#fff",
-    borderRadius: 16,
-    marginBottom: 18,
-    padding: 12,
-    elevation: 3,
+    marginBottom: 15,
+    padding: 10,
+    borderRadius: 12,
   },
-
   heart: {
-  position: "absolute",
-  right: 12,
-  top: 12,
-  zIndex: 999,
-  elevation: 20,
-  backgroundColor: "#fff",
-  borderRadius: 50,
-  padding: 8,
-},
-
+    position: "absolute",
+    right: 10,
+    top: 10,
+    zIndex: 10,
+  },
   image: {
     width: "100%",
     height: 160,
-    borderRadius: 12,
-    marginBottom: 10,
+    borderRadius: 10,
   },
-
   bookTitle: {
-    fontSize: 18,
+    fontSize: 16,
     fontWeight: "bold",
-    marginBottom: 4,
+    marginTop: 10,
   },
-
   author: {
     color: "#666",
-    marginBottom: 10,
-    fontSize: 13,
-  },
-
-  btn: {
-    backgroundColor: "#2563eb",
-    paddingVertical: 12,
-    borderRadius: 10,
-    alignItems: "center",
-  },
-
-  disabledBtn: {
-    backgroundColor: "#9ca3af",
-  },
-
-  btnText: {
-    color: "#fff",
-    fontWeight: "bold",
   },
 });
