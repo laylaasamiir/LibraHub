@@ -24,11 +24,10 @@ export default function RootLayout() {
 
     if (user) {
       router.replace("/(tabs)");
-    } else {
-     router.replace("/");    }
+    } 
   }, [user, loading]);
 
   if (loading) return null;
 
-  return <Stack screenOptions={{ headerShown: false }} />;
+return <Stack screenOptions={{ headerShown: false }} />;
 }
