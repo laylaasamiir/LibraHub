@@ -2,22 +2,11 @@ body {
   font-family: Arial, sans-serif;
 }
 
-.toggle-button {
-  position: fixed;
-  bottom: 10px;
-  left: 20px;
-  z-index: 1001;
-  padding: 10px 15px;
-  background: #295c97;
-  color: white;
-  border: none;
-  border-radius: 8px;
-  cursor: pointer;
-}
+
 
 .sidebar {
   position: fixed;
-  top: 0;
+  top: auto;
   left: -350px;
   width: 350px;
   height: calc(100% - 60px);
@@ -29,6 +18,7 @@ body {
   display: flex;
   flex-direction: column;
   box-sizing: border-box;
+  bottom: 50px;
 }
 
 .sidebar.open {

@@ -3,10 +3,10 @@ import "./Reviews.css";
 import { collection, addDoc, query, orderBy, onSnapshot } from "firebase/firestore";
 import { db, auth } from "../firebase";
 
-export default function ReviewsSidebar() {
+export default function ReviewsSidebar({ isOpen, setIsOpen })  {
   const [reviews, setReviews] = useState("");
   const [submittedReviews, setSubmittedReviews] = useState([]);
-  const [isOpen, setIsOpen] = useState(false);
+  
 
   useEffect(() => {
     const q = query(collection(db, "reviews"), orderBy("createdAt", "desc"));
@@ -37,9 +37,6 @@ export default function ReviewsSidebar() {
 
   return (
     <>
-      <button className="toggle-button" onClick={() => setIsOpen(!isOpen)}>
-        {isOpen ? "Close Reviews" : "Open Reviews"}
-      </button>
 
       <div className={`sidebar ${isOpen ? "open" : ""}`}>
         <h2>Reviews</h2>
