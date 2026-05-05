@@ -6,12 +6,14 @@ import "./addBook.css";
 const ConfirmTable = () => {
   const [borrowedBooks, setBorrowedBooks] = useState([]);
   const [borrowDuration, setBorrowDuration] = useState(7);
-
+  const [dailyFine, setDailyFine] = useState(30);
   const fetchSettings = async () => {
     const docRef = doc(db, "settings", "libraryConfig");
     const docSnap = await getDoc(docRef);
     if (docSnap.exists()) {
+      const data = docSnap.data();
       setBorrowDuration(docSnap.data().borrowDuration);
+      setDailyFine(data.dailyFine || 30);
     }
   };
 
@@ -74,10 +76,23 @@ const handleReturn = async (borrowEntry) => {
     if (compareDate > dueDate) {
       const diffTime = Math.abs(compareDate - dueDate);
       const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-      return { dueDate: dueDate.toLocaleDateString(), fine: diffDays * 50 };
-    }
+      return { dueDate: dueDate.toLocaleDateString(), fine: diffDays * dailyFine };
+  }
+    
     return { dueDate: dueDate.toLocaleDateString(), fine: 0 };
   };
+
+  const updateDailyFine = async (newFine) => {
+  setDailyFine(newFine);
+  const settingsRef = doc(db, "settings", "libraryConfig");
+  try {
+    await updateDoc(settingsRef, {
+      dailyFine: Number(newFine)
+    });
+  } catch (error) {
+    console.error("Error updating fine: ", error);
+  }
+};
 
   const updateBorrowDuration = async (newDuration) => {
     setBorrowDuration(newDuration);
@@ -106,6 +121,17 @@ const handleReturn = async (borrowEntry) => {
             style={{ width: "60px", padding: "5px", borderRadius: "4px", border: "1px solid #ccc" }}
           />
         </div>
+
+        <div style={{ marginBottom: "20px", padding: "10px", background: "#f8f9fa", borderRadius: "8px", display: "inline-block", marginLeft: "10px" }}>
+          <label style={{ fontWeight: "bold", marginRight: "10px" }}>Daily Fine (EGP): </label>
+                <input 
+                  type="number" 
+                  min="10"
+                  value={dailyFine} 
+                  onChange={(e) => updateDailyFine(e.target.value)}
+                  style={{ width: "60px", padding: "5px", borderRadius: "4px", border: "1px solid #ccc" }}
+                />
+       </div>
 
         <table className="books-table">
           <thead>

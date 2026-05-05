@@ -8,12 +8,14 @@ export const StuTable = () => {
   const [books, setBooks] = useState([]);
   const [loading, setLoading] = useState(true);
   const [borrowDuration, setBorrowDuration] = useState(7);
+  const [dailyFine, setDailyFine] = useState(30);
 
   const fetchSettings = async () => {
     const docSnap = await getDocs(collection(db, "settings"));
     if (!docSnap.empty) {
       const config = docSnap.docs.find(d => d.id === "libraryConfig");
       if (config) setBorrowDuration(config.data().borrowDuration);
+      if(config)setDailyFine(config.data().dailyFine || 30);
     }
   };
 
@@ -65,7 +67,7 @@ export const StuTable = () => {
     if (today > dueDate) {
       const diffTime = Math.abs(today - dueDate);
       const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-      return { dueDate: dueDate.toLocaleDateString(), fine: diffDays * 50 };
+      return { dueDate: dueDate.toLocaleDateString(), fine: diffDays * Number(dailyFine) };
     }
     return { dueDate: dueDate.toLocaleDateString(), fine: 0 };
   };
