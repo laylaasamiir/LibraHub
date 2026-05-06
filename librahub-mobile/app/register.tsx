@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { View, Text, TextInput, TouchableOpacity, StyleSheet, Alert, ScrollView } from "react-native";
 import { createUserWithEmailAndPassword } from "firebase/auth";
-import { auth, db } from '../../components/firebase';
+import { auth, db } from '@/components/firebase';
 import { doc, setDoc } from "firebase/firestore";
 import { Picker } from "@react-native-picker/picker";
 

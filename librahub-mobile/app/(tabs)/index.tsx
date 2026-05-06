@@ -28,7 +28,7 @@ export default function HomeScreen() {
   const [favBooks, setFavBooks] = useState([]);
   const [searchTerm, setSearchTerm] = useState("");
 
-  
+   
   useEffect(() => {
     const fetchBooks = async () => {
       const snap = await getDocs(collection(db, "books"));
@@ -39,7 +39,7 @@ export default function HomeScreen() {
     fetchBooks();
   }, []);
 
-  
+   
   useEffect(() => {
     const user = auth.currentUser;
     if (!user) return;
@@ -71,10 +71,10 @@ export default function HomeScreen() {
     const snap = await getDocs(q);
 
     if (!snap.empty) {
-      
+    
       await deleteDoc(doc(db, "favorites", snap.docs[0].id));
 
-      
+     
       setFavBooks((prev) => prev.filter((id) => id !== book.id));
     } else {
       
@@ -83,7 +83,7 @@ export default function HomeScreen() {
         bookId: book.id,
       });
 
-      
+     
       setFavBooks((prev) => [...prev, book.id]);
     }
   };
@@ -110,7 +110,7 @@ export default function HomeScreen() {
         renderItem={({ item }) => (
           <View style={styles.card}>
             
-            {}
+            
             <Pressable
               style={styles.heart}
               onPress={() => toggleFav(item)}

@@ -28,6 +28,16 @@ export default function TabLayout() {
         }}
       />
 
+<Tabs.Screen
+  name="logout"
+  options={{
+    title: "Exit",
+    tabBarIcon: ({ color }) => (
+      <IconSymbol size={28} name="arrow.right.square.fill" color={color} />
+    ),
+  }}
+/>
+
       <Tabs.Screen
         name="favorites"
         options={{
