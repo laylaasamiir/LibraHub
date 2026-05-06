@@ -50,8 +50,61 @@ const Borrow = () => {
                 setColor("red");
                 return;
             }
+<<<<<<< HEAD
+=======
 
 
+            const bookDoc = querySnapshot.docs[0];
+            const bookData = bookDoc.data();
+            if (bookData.isBorrowed === true) {
+                setMessage("This book is already borrowed.");
+                setColor("#ffc107");
+                return;
+            }
+
+
+            await addDoc(collection(db, "borrowedBooks"), {
+                studentName: borrowData.studentName,
+                studentCode: borrowData.studentCode,
+                bookCode: Number(borrowData.bookCode),
+                bookDocId: bookDoc.id,
+                bookTitle: bookData.title,
+                borrowedAt: serverTimestamp(),
+                status: "borrowed",
+            });
+
+
+            await updateDoc(doc(db, "books", bookDoc.id), {
+                isBorrowed: true,
+                borrowedByCode: borrowData.studentCode,
+            });
+
+            setMessage("Book borrowed successfully!");
+            setColor("green");
+
+            setBorrowData({
+                studentName: "",
+                studentCode: "",
+                bookCode: "",
+            });
+        } catch (error) {
+            console.error("Error borrowing book:", error);
+            alert("Failed to borrow book.");
+        }
+    };
+const handleReturn = async () => {
+    try {
+        
+        const booksRef = collection(db, "books");
+        const q = query(
+            booksRef,
+            where("bookId", "==", Number(borrowData.bookCode))
+        );
+>>>>>>> 53ed599c35bd6a2a76c06dfca42055977034cecc
+
+        const querySnapshot = await getDocs(q);
+
+<<<<<<< HEAD
             const bookDoc = querySnapshot.docs[0];
             const bookData = bookDoc.data();
             if (bookData.isBorrowed === true) {
@@ -125,21 +178,59 @@ const handleReturn = async () => {
         }
 
         
+=======
+        if (querySnapshot.empty) {
+            setMessage("❌ Book not found.");
+            setColor("red");
+            return;
+        }
+
+        const bookDoc = querySnapshot.docs[0];
+        const bookData = bookDoc.data();
+
+      
+        if (!bookData.isBorrowed) {
+            setMessage("⚠️ This book is not currently borrowed.");
+            setColor("#ffc107");
+            return;
+        }
+
+      
+        if (String(bookData.borrowedByCode).trim() !== String(borrowData.studentCode).trim()) {
+            setMessage("❌ This book was borrowed by a different student.");
+            setColor("red");
+            return;
+        }
+
+     
+>>>>>>> 53ed599c35bd6a2a76c06dfca42055977034cecc
         await updateDoc(doc(db, "books", bookDoc.id), {
             isBorrowed: false,
             borrowedByCode: ""
         });
 
+<<<<<<< HEAD
         
         const borrowRef = collection(db, "borrowedBooks");
         const borrowQuery = query(
             borrowRef,
             where("bookId", "==", bookDoc.id), 
+=======
+     
+        const borrowRef = collection(db, "borrowedBooks");
+        const borrowQuery = query(
+            borrowRef,
+            where("bookId", "==", bookDoc.id), 
+>>>>>>> 53ed599c35bd6a2a76c06dfca42055977034cecc
             where("status", "==", "borrowed")
         );
 
         const borrowSnapshot = await getDocs(borrowQuery);
+<<<<<<< HEAD
         console.log("Found borrow records:", borrowSnapshot.size); 
+=======
+        console.log("Found borrow records:", borrowSnapshot.size); 
+>>>>>>> 53ed599c35bd6a2a76c06dfca42055977034cecc
 
         if (!borrowSnapshot.empty) {
             const borrowDocRef = borrowSnapshot.docs[0];

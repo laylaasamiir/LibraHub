@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { View, Text, TextInput, TouchableOpacity, StyleSheet, Alert, ScrollView } from "react-native";
 import { createUserWithEmailAndPassword } from "firebase/auth";
-import { auth, db } from '../components/firebase'; 
+import { auth, db } from '../../components/firebase';
 import { doc, setDoc } from "firebase/firestore";
 import { Picker } from "@react-native-picker/picker";
 
@@ -11,48 +11,85 @@ export default function RegisterScreen({ onRegisterSuccess, onLoginPress }) {
     const [password, setPassword] = useState("");
     const [level, setLevel] = useState("");
     const [department, setDepartment] = useState("");
+
     const [errorEmail, setErrorEmail] = useState("");
     const [errorPassword, setErrorPassword] = useState("");
     const [errorName, setErrorName] = useState("");
 
     const handleRegister = async () => {
-        setErrorEmail(""); setErrِorPassword(""); setErrorName("");
+        setErrorEmail("");
+        setErrorPassword("");
+        setErrorName("");
+
         let valid = true;
 
-        if (!name) { setErrorName("Name is required"); valid = false; }
-        if (!email) { setErrorEmail("Email is required"); valid = false; }
-        if (password.length < 6) { setErrorPassword("Password must be at least 6 characters"); valid = false; }
+        if (!name) {
+            setErrorName("Name is required");
+            valid = false;
+        }
+
+        if (!email) {
+            setErrorEmail("Email is required");
+            valid = false;
+        }
+
+        if (password.length < 6) {
+            setErrorPassword("Password must be at least 6 characters");
+            valid = false;
+        }
+
+        if (!level) {
+            Alert.alert("Please select level");
+            valid = false;
+        }
+
         if (!valid) return;
 
         try {
             const res = await createUserWithEmailAndPassword(auth, email, password);
 
-      
             await setDoc(doc(db, "users", res.user.uid), {
-                name, email, role: "student", department, level, createdAt: Date.now(),
+                name,
+                email,
+                role: "student",
+                department,
+                level,
+                createdAt: Date.now(),
             });
 
             Alert.alert("Success", "Account created successfully");
+
+           
             onRegisterSuccess();
+
         } catch (e) {
             console.log(e.code);
+
             switch (e.code) {
-                case "auth/email-already-in-use": setErrorEmail("Email already registered"); break;
-                case "auth/invalid-email": setErrorEmail("Invalid email format"); break;
-                default: setErrorEmail("Registration failed. Please try again.");
+                case "auth/email-already-in-use":
+                    setErrorEmail("Email already registered");
+                    break;
+
+                case "auth/invalid-email":
+                    setErrorEmail("Invalid email format");
+                    break;
+
+                default:
+                    setErrorEmail("Registration failed. Try again.");
             }
         }
     };
 
     return (
         <ScrollView contentContainerStyle={styles.container}>
+
             <Text style={styles.title}>Student Information</Text>
 
             {errorName ? <Text style={styles.error}>{errorName}</Text> : null}
             <TextInput placeholder="Full Name" style={styles.input} value={name} onChangeText={setName} />
 
             {errorEmail ? <Text style={styles.error}>{errorEmail}</Text> : null}
-            <TextInput placeholder="Email" style={styles.input} value={email} onChangeText={setEmail} keyboardType="email-address" autoCapitalize="none" />
+            <TextInput placeholder="Email" style={styles.input} value={email} onChangeText={setEmail} />
 
             {errorPassword ? <Text style={styles.error}>{errorPassword}</Text> : null}
             <TextInput placeholder="Password" style={styles.input} value={password} onChangeText={setPassword} secureTextEntry />
@@ -76,12 +113,13 @@ export default function RegisterScreen({ onRegisterSuccess, onLoginPress }) {
             <TouchableOpacity onPress={onLoginPress}>
                 <Text style={styles.link}>Already have an account? Login</Text>
             </TouchableOpacity>
+
         </ScrollView>
     );
 }
 
 const styles = StyleSheet.create({
-    container: { padding: 25, justifyContent: 'center', flexGrow: 1, backgroundColor: '#f0f2f5' },
+    container: { padding: 25, flexGrow: 1, backgroundColor: '#f0f2f5' },
     title: { fontSize: 24, fontWeight: "bold", marginBottom: 20, color: "#2f68aa", textAlign: "center" },
     input: { borderWidth: 1, borderColor: "#ccc", borderRadius: 5, padding: 10, marginBottom: 12, backgroundColor: "white" },
     pickerContainer: { borderWidth: 1, borderColor: "#ccc", borderRadius: 5, marginBottom: 12, backgroundColor: "white" },
