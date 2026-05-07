@@ -1,5 +1,6 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { createUserWithEmailAndPassword } from "firebase/auth";
+import { signOut } from "firebase/auth";
 import { auth, db } from "../firebase";
 import { doc, setDoc } from "firebase/firestore";
 import { updateProfile } from "firebase/auth";
@@ -7,6 +8,9 @@ import '../Pages/login.css'
 import { Link, useNavigate } from "react-router-dom";
 
 export default function Register() {
+  useEffect(() => {
+  signOut(auth);
+  }, []);
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -91,7 +95,7 @@ export default function Register() {
       <div className="login-page">
         <main className="login-main">
           <div className="login-container">
-            <h1 className="login-title">Studet Information</h1>
+            <h1 className="login-title">Student Information</h1>
             <form className="login-form" action="#" method="post">
               {errorName && <div className="input-error">{errorName}</div>}
               <label className="login-label">Name</label>
