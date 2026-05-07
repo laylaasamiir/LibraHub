@@ -3,7 +3,7 @@ import { collection, getDocs } from "firebase/firestore";
 import { db } from "../components/firebase";
 
  
-const OPENROUTER_API_KEY = "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";
+const OPENROUTER_API_KEY = process.env.EXPO_PUBLIC_OPENROUTER_API_KEY;
 
 let cachedBooks = [];
 
