@@ -1,4 +1,5 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
+import { signOut } from "firebase/auth";
 import {
   signInWithEmailAndPassword,
   FacebookAuthProvider,
@@ -15,6 +16,9 @@ import { FcGoogle } from "react-icons/fc";
 import "./login.css";
 
 const Login = () => {
+  useEffect(() => {
+  signOut(auth);
+  }, []);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
 
