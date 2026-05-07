@@ -47,9 +47,7 @@
     text-decoration: none;
     color: #888;
     font-size: 12px;
- 
     cursor: pointer;
- 
 }
 
 .nav-item.active, .nav-item:hover {

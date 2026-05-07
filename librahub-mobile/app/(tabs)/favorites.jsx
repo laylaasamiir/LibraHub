@@ -8,7 +8,6 @@ import {
   StyleSheet,
   Alert,
 } from "react-native";
-
 import {
   collection,
   getDocs,
@@ -16,14 +15,16 @@ import {
   where,
   deleteDoc,
   doc,
-  onSnapshot
+  onSnapshot,
 } from "firebase/firestore";
-
 import { onAuthStateChanged } from "firebase/auth";
+import { useRouter } from "expo-router";
 
 import { auth, db } from "../../components/firebase";
 
 export default function FavoritesScreen() {
+  const router = useRouter();
+
   const [favBooks, setFavBooks] = useState([]);
   const [loading, setLoading] = useState(true);
 
@@ -34,40 +35,58 @@ export default function FavoritesScreen() {
         setLoading(false);
         return;
       }
-  
+
       const q = query(
         collection(db, "favorites"),
-        where("userId", "==", user.uid)
+        where("userId", "==", user.uid),
       );
-  
+
       const unsubscribeFav = onSnapshot(q, async (favSnap) => {
-        const favList = favSnap.docs.map((doc) => ({
-          id: doc.id,
-          ...doc.data(),
+        const favList = favSnap.docs.map((d) => ({
+          id: d.id,
+          ...d.data(),
         }));
-  
+
         const booksSnap = await getDocs(collection(db, "books"));
-  
+
         const booksMap = {};
-        booksSnap.docs.forEach((doc) => {
-          booksMap[doc.id] = doc.data();
+        booksSnap.docs.forEach((d) => {
+          booksMap[d.id] = {
+            id: d.id,
+            ...d.data(),
+          };
         });
-  
-        const finalData = favList.map((fav) => ({
-          ...booksMap[fav.bookId],
-          id: fav.bookId,
-          favDocId: fav.id,
-        }));
-  
+
+        const finalData = favList
+          .map((fav) => ({
+            ...booksMap[fav.bookId],
+            id: fav.bookId,
+            favDocId: fav.id,
+          }))
+          .filter((book) => book.title);
+
         setFavBooks(finalData);
         setLoading(false);
       });
-  
+
       return () => unsubscribeFav();
     });
-  
+
     return () => unsubscribeAuth();
   }, []);
+
+  const removeFromFavorites = async (favDocId) => {
+    try {
+      await deleteDoc(doc(db, "favorites", favDocId));
+
+      setFavBooks((prev) => prev.filter((book) => book.favDocId !== favDocId));
+
+      Alert.alert("Removed", "Removed from Favorites 💔");
+    } catch (error) {
+      console.log(error);
+      Alert.alert("Error", "Error removing favorite");
+    }
+  };
 
   if (loading) {
     return (
@@ -76,20 +95,6 @@ export default function FavoritesScreen() {
       </View>
     );
   }
-  const removeFromFavorites = async (favDocId) => {
-    try {
-      await deleteDoc(doc(db, "favorites", favDocId));
-  
-      setFavBooks((prev) =>
-        prev.filter((book) => book.favDocId !== favDocId)
-      );
-  
-      Alert.alert("Removed from Favorites");
-    } catch (error) {
-      console.log(error);
-      Alert.alert("Error removing");
-    }
-  };
 
   return (
     <View style={styles.container}>
@@ -101,8 +106,17 @@ export default function FavoritesScreen() {
         <FlatList
           data={favBooks}
           keyExtractor={(item) => item.favDocId}
+          showsVerticalScrollIndicator={false}
           renderItem={({ item }) => (
-            <View style={styles.card}>
+            <Pressable
+              style={styles.card}
+              onPress={() =>
+                router.push({
+                  pathname: "/book-details",
+                  params: { bookId: item.id },
+                })
+              }
+            >
               <Pressable
                 style={styles.remove}
                 onPress={() => removeFromFavorites(item.favDocId)}
@@ -114,30 +128,25 @@ export default function FavoritesScreen() {
                 source={{
                   uri:
                     item.coverUrl ||
+                    item.image ||
                     "https://dummyimage.com/150x150/ccc/000",
                 }}
                 style={styles.image}
               />
 
-              <Text style={styles.bookTitle}>
-                {item.title || "No title"}
-              </Text>
+              <Text style={styles.bookTitle}>{item.title || "No title"}</Text>
 
-              <Text style={styles.author}>
-                By: {item.author || "Unknown"}
-              </Text>
+              <Text style={styles.author}>By: {item.author || "Unknown"}</Text>
 
               <Text
                 style={[
                   styles.status,
-                  item.isBorrowed
-                    ? styles.borrowed
-                    : styles.available,
+                  item.isBorrowed ? styles.borrowed : styles.available,
                 ]}
               >
                 {item.isBorrowed ? "Borrowed" : "Available"}
               </Text>
-            </View>
+            </Pressable>
           )}
         />
       )}
@@ -179,6 +188,13 @@ const styles = StyleSheet.create({
     right: 10,
     top: 10,
     zIndex: 2,
+    backgroundColor: "#fff",
+    width: 34,
+    height: 34,
+    borderRadius: 17,
+    alignItems: "center",
+    justifyContent: "center",
+    elevation: 3,
   },
 
   image: {
@@ -204,6 +220,7 @@ const styles = StyleSheet.create({
     borderRadius: 8,
     textAlign: "center",
     color: "#fff",
+    overflow: "hidden",
   },
 
   available: {

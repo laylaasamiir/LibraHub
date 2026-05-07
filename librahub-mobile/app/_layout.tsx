@@ -1,13 +1,10 @@
 import { Stack } from "expo-router";
 import { useEffect, useState } from "react";
 import { auth } from "../components/firebase";
-import { onAuthStateChanged } from "firebase/auth";
-import { useRouter } from "expo-router";
+import { onAuthStateChanged, User } from "firebase/auth";
 
 export default function RootLayout() {
-  const router = useRouter();
-
-  const [user, setUser] = useState(null);
+  const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -18,15 +15,6 @@ export default function RootLayout() {
 
     return unsub;
   }, []);
-
-  useEffect(() => {
-    if (loading) return;
-
-    if (user) {
-      router.replace("/(tabs)");
-    } else {
-     router.replace("/");    }
-  }, [user, loading]);
 
   if (loading) return null;
 

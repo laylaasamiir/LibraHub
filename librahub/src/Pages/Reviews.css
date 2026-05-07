@@ -2,45 +2,21 @@ body {
   font-family: Arial, sans-serif;
 }
 
-<<<<<<< HEAD
-.toggle-button {
-  position: fixed;
-  bottom: 10px;
-  left: 20px;
-  z-index: 1001;
-  padding: 10px 15px;
-  background: #295c97;
-  color: white;
-  border: none;
-  border-radius: 8px;
-  cursor: pointer;
-}
-
-.sidebar {
-  position: fixed;
-  top: 0;
-=======
-
-
 .sidebar {
   position: fixed;
   top: auto;
->>>>>>> 53ed599c35bd6a2a76c06dfca42055977034cecc
   left: -350px;
   width: 350px;
   height: calc(100% - 60px);
   background: white;
-  box-shadow: 2px 0 10px rgba(0,0,0,0.2);
+  box-shadow: 2px 0 10px rgba(0, 0, 0, 0.2);
   padding: 20px;
   transition: left 0.3s ease;
   z-index: 1000;
   display: flex;
   flex-direction: column;
   box-sizing: border-box;
-<<<<<<< HEAD
-=======
   bottom: 50px;
->>>>>>> 53ed599c35bd6a2a76c06dfca42055977034cecc
 }
 
 .sidebar.open {
@@ -92,4 +68,54 @@ textarea {
 
 .sidebar button:hover {
   background: #255a94;
+}
+
+.book-badge {
+  background: #e3f2fd;
+  color: #1976d2;
+  font-size: 11px;
+  padding: 2px 8px;
+  border-radius: 12px;
+  border: 1px solid #bbdefb;
+  white-space: nowrap;
+  max-width: 150px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.review {
+  background: #f9f9f9;
+  padding: 12px;
+  border-radius: 8px;
+  margin-bottom: 12px;
+  border-left: 4px solid #2f68aa;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+}
+
+.sidebar {
+  height: calc(100% - 110px);
+  bottom: 50px;
+}
+.review-error {
+  color: #ff4d4d;
+  font-size: 14px;
+  margin: 8px 0;
+}
+.site-rating-summary {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 16px;
+  font-size: 14px;
+}
+
+.site-rating-stars {
+  display: flex;
+  gap: 2px;
+}
+.reviews-overlay {
+  position: fixed;
+  inset: 0;
+  background: transparent;
+  z-index: 999;
 }

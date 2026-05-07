@@ -1,130 +1,322 @@
 import React, { useState } from "react";
-import { View, Text, TextInput, TouchableOpacity, StyleSheet, Alert, ScrollView } from "react-native";
-import { createUserWithEmailAndPassword } from "firebase/auth";
-import { auth, db } from '@/components/firebase';
+import {
+  View,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  StyleSheet,
+  ScrollView,
+  Alert,
+} from "react-native";
+import { useRouter } from "expo-router";
+import { createUserWithEmailAndPassword, updateProfile } from "firebase/auth";
 import { doc, setDoc } from "firebase/firestore";
-import { Picker } from "@react-native-picker/picker";
 
-export default function RegisterScreen({ onRegisterSuccess, onLoginPress }) {
-    const [name, setName] = useState("");
-    const [email, setEmail] = useState("");
-    const [password, setPassword] = useState("");
-    const [level, setLevel] = useState("");
-    const [department, setDepartment] = useState("");
+import { auth, db } from "../components/firebase";
 
-    const [errorEmail, setErrorEmail] = useState("");
-    const [errorPassword, setErrorPassword] = useState("");
-    const [errorName, setErrorName] = useState("");
+export default function RegisterScreen() {
+  const router = useRouter();
 
-    const handleRegister = async () => {
-        setErrorEmail("");
-        setErrorPassword("");
-        setErrorName("");
+  const [name, setName] = useState("");
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
 
-        let valid = true;
+  const [level, setLevel] = useState("");
+  const [department, setDepartment] = useState("");
+  const [studentCode, setStudentCode] = useState("");
 
-        if (!name) {
-            setErrorName("Name is required");
-            valid = false;
-        }
+  const [errorName, setErrorName] = useState("");
+  const [errorEmail, setErrorEmail] = useState("");
+  const [errorPassword, setErrorPassword] = useState("");
 
-        if (!email) {
-            setErrorEmail("Email is required");
-            valid = false;
-        }
+  const handleRegister = async () => {
+    setErrorName("");
+    setErrorEmail("");
+    setErrorPassword("");
 
-        if (password.length < 6) {
-            setErrorPassword("Password must be at least 6 characters");
-            valid = false;
-        }
+    let valid = true;
 
-        if (!level) {
-            Alert.alert("Please select level");
-            valid = false;
-        }
+    if (!name.trim()) {
+      setErrorName("Name is required");
+      valid = false;
+    }
 
-        if (!valid) return;
+    if (!email.trim()) {
+      setErrorEmail("Email is required");
+      valid = false;
+    }
 
-        try {
-            const res = await createUserWithEmailAndPassword(auth, email, password);
+    if (password.length < 6) {
+      setErrorPassword("Password must be at least 6 characters");
+      valid = false;
+    }
 
-            await setDoc(doc(db, "users", res.user.uid), {
-                name,
-                email,
-                role: "student",
-                department,
-                level,
-                createdAt: Date.now(),
-            });
+    if (!valid) return;
 
-            Alert.alert("Success", "Account created successfully");
+    try {
+      const res = await createUserWithEmailAndPassword(
+        auth,
+        email.trim(),
+        password,
+      );
 
-           
-            onRegisterSuccess();
+      await updateProfile(res.user, {
+        displayName: name.trim(),
+      });
 
-        } catch (e) {
-            console.log(e.code);
+      await setDoc(doc(db, "users", res.user.uid), {
+        uid: res.user.uid,
+        name: name.trim(),
+        email: email.trim(),
+        role: "student",
+        department: department.trim(),
+        level,
+        studentCode: studentCode.trim(),
+        createdAt: Date.now(),
+      });
 
-            switch (e.code) {
-                case "auth/email-already-in-use":
-                    setErrorEmail("Email already registered");
-                    break;
+      Alert.alert("Success", "Account created successfully");
 
-                case "auth/invalid-email":
-                    setErrorEmail("Invalid email format");
-                    break;
+      router.replace("/(tabs)");
+    } catch (e: any) {
+      switch (e.code) {
+        case "auth/email-already-in-use":
+          setErrorEmail("Email already registered");
+          break;
 
-                default:
-                    setErrorEmail("Registration failed. Try again.");
-            }
-        }
-    };
+        case "auth/invalid-email":
+          setErrorEmail("Invalid email format");
+          break;
 
-    return (
-        <ScrollView contentContainerStyle={styles.container}>
+        case "auth/weak-password":
+          setErrorPassword("Password is too weak, min 6 characters");
+          break;
 
-            <Text style={styles.title}>Student Information</Text>
+        case "auth/missing-password":
+          setErrorPassword("Password is required");
+          break;
 
-            {errorName ? <Text style={styles.error}>{errorName}</Text> : null}
-            <TextInput placeholder="Full Name" style={styles.input} value={name} onChangeText={setName} />
+        default:
+          setErrorEmail("Something went wrong. Please try again.");
+      }
+    }
+  };
 
-            {errorEmail ? <Text style={styles.error}>{errorEmail}</Text> : null}
-            <TextInput placeholder="Email" style={styles.input} value={email} onChangeText={setEmail} />
+  return (
+    <ScrollView contentContainerStyle={styles.page}>
+      <View style={styles.container}>
+        <Text style={styles.title}>Student Information</Text>
 
-            {errorPassword ? <Text style={styles.error}>{errorPassword}</Text> : null}
-            <TextInput placeholder="Password" style={styles.input} value={password} onChangeText={setPassword} secureTextEntry />
+        {errorName ? <Text style={styles.inputError}>{errorName}</Text> : null}
+        <Text style={styles.label}>Name</Text>
+        <TextInput
+          placeholder="Full Name"
+          value={name}
+          onChangeText={(text) => {
+            setName(text);
+            setErrorName("");
+          }}
+          style={styles.input}
+        />
 
-            <TextInput placeholder="Department" style={styles.input} value={department} onChangeText={setDepartment} />
+        {errorEmail ? (
+          <Text style={styles.inputError}>{errorEmail}</Text>
+        ) : null}
+        <Text style={styles.label}>Email</Text>
+        <TextInput
+          placeholder="Enter your email"
+          value={email}
+          onChangeText={(text) => {
+            setEmail(text);
+            setErrorEmail("");
+          }}
+          style={styles.input}
+          keyboardType="email-address"
+          autoCapitalize="none"
+        />
 
-            <View style={styles.pickerContainer}>
-                <Picker selectedValue={level} onValueChange={(val) => setLevel(val)}>
-                    <Picker.Item label="Choose Level" value="" />
-                    <Picker.Item label="Level 1" value="1" />
-                    <Picker.Item label="Level 2" value="2" />
-                    <Picker.Item label="Level 3" value="3" />
-                    <Picker.Item label="Level 4" value="4" />
-                </Picker>
-            </View>
+        {errorPassword ? (
+          <Text style={styles.inputError}>{errorPassword}</Text>
+        ) : null}
+        <Text style={styles.label}>Password</Text>
+        <TextInput
+          placeholder="Enter your password"
+          value={password}
+          onChangeText={(text) => {
+            setPassword(text);
+            setErrorPassword("");
+          }}
+          style={styles.input}
+          secureTextEntry
+        />
 
-            <TouchableOpacity style={styles.button} onPress={handleRegister}>
-                <Text style={styles.buttonText}>Create Account</Text>
+        <Text style={styles.label}>Department</Text>
+        <TextInput
+          placeholder="Department"
+          value={department}
+          onChangeText={setDepartment}
+          style={styles.input}
+        />
+
+        <Text style={styles.label}>Student Code</Text>
+        <TextInput
+          placeholder="Student Code"
+          value={studentCode}
+          onChangeText={setStudentCode}
+          style={styles.input}
+          keyboardType="number-pad"
+        />
+
+        <Text style={styles.label}>Level</Text>
+        <View style={styles.levelBox}>
+          {["1", "2", "3", "4"].map((item) => (
+            <TouchableOpacity
+              key={item}
+              style={[styles.levelBtn, level === item && styles.levelBtnActive]}
+              onPress={() => setLevel(item)}
+            >
+              <Text
+                style={[
+                  styles.levelText,
+                  level === item && styles.levelTextActive,
+                ]}
+              >
+                Level {item}
+              </Text>
             </TouchableOpacity>
+          ))}
+        </View>
 
-            <TouchableOpacity onPress={onLoginPress}>
-                <Text style={styles.link}>Already have an account? Login</Text>
-            </TouchableOpacity>
+        <TouchableOpacity style={styles.button} onPress={handleRegister}>
+          <Text style={styles.buttonText}>Create account</Text>
+        </TouchableOpacity>
 
-        </ScrollView>
-    );
+        <View style={styles.footer}>
+          <Text style={styles.footerText}>Do you have an account? </Text>
+
+          <TouchableOpacity onPress={() => router.push("/login")}>
+            <Text style={styles.link}>Login</Text>
+          </TouchableOpacity>
+        </View>
+      </View>
+    </ScrollView>
+  );
 }
 
 const styles = StyleSheet.create({
-    container: { padding: 25, flexGrow: 1, backgroundColor: '#f0f2f5' },
-    title: { fontSize: 24, fontWeight: "bold", marginBottom: 20, color: "#2f68aa", textAlign: "center" },
-    input: { borderWidth: 1, borderColor: "#ccc", borderRadius: 5, padding: 10, marginBottom: 12, backgroundColor: "white" },
-    pickerContainer: { borderWidth: 1, borderColor: "#ccc", borderRadius: 5, marginBottom: 12, backgroundColor: "white" },
-    button: { backgroundColor: "#2f68aa", padding: 12, borderRadius: 5, alignItems: "center", marginTop: 10 },
-    buttonText: { color: "white", fontWeight: "bold" },
-    link: { marginTop: 15, textAlign: "center", color: "#2f68aa" },
-    error: { color: "red", marginBottom: 5, fontSize: 12 }
+  page: {
+    flexGrow: 1,
+    backgroundColor: "#f0f2f5",
+    justifyContent: "center",
+    alignItems: "center",
+    padding: 20,
+  },
+
+  container: {
+    backgroundColor: "#ffffff",
+    padding: 30,
+    borderRadius: 10,
+    width: "100%",
+    maxWidth: 400,
+    alignItems: "center",
+    elevation: 5,
+  },
+
+  title: {
+    marginBottom: 20,
+    color: "#2f68aa",
+    fontSize: 25,
+    fontWeight: "bold",
+    textAlign: "center",
+  },
+
+  label: {
+    width: "100%",
+    marginBottom: 5,
+    textAlign: "left",
+    color: "#333",
+    fontWeight: "600",
+  },
+
+  input: {
+    width: "100%",
+    marginBottom: 15,
+    padding: 11,
+    borderRadius: 5,
+    borderWidth: 1,
+    borderColor: "#ccc",
+    backgroundColor: "#fff",
+  },
+
+  inputError: {
+    width: "100%",
+    color: "#d32f2f",
+    fontSize: 13,
+    fontWeight: "500",
+    marginBottom: 4,
+    marginTop: 8,
+  },
+
+  levelBox: {
+    width: "100%",
+    flexDirection: "row",
+    flexWrap: "wrap",
+    gap: 8,
+    marginBottom: 15,
+  },
+
+  levelBtn: {
+    flex: 1,
+    minWidth: "45%",
+    paddingVertical: 10,
+    borderRadius: 6,
+    borderWidth: 1,
+    borderColor: "#ccc",
+    alignItems: "center",
+    backgroundColor: "#fff",
+  },
+
+  levelBtnActive: {
+    backgroundColor: "#2f68aa",
+    borderColor: "#2f68aa",
+  },
+
+  levelText: {
+    color: "#333",
+    fontWeight: "600",
+  },
+
+  levelTextActive: {
+    color: "#fff",
+  },
+
+  button: {
+    width: "100%",
+    padding: 12,
+    borderRadius: 5,
+    backgroundColor: "#2f68aa",
+    alignItems: "center",
+    marginTop: 5,
+  },
+
+  buttonText: {
+    color: "#ffffff",
+    fontWeight: "bold",
+    fontSize: 16,
+  },
+
+  footer: {
+    flexDirection: "row",
+    marginTop: 15,
+  },
+
+  footerText: {
+    fontSize: 14,
+    color: "#333",
+  },
+
+  link: {
+    color: "#2f68aa",
+    fontWeight: "bold",
+  },
 });
