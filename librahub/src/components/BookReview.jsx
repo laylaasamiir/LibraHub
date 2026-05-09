@@ -110,7 +110,7 @@ export default function BookReview({ imageBase64, onSaved, onCancel }) {
         category,
         description,
         coverUrl: book.coverUrl || imageBase64,
-        code: randomCode.toString(),
+        bookId: randomCode.toString(),
         isBorrowed: false,
         createdAt: new Date(),
       });
